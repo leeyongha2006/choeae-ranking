@@ -5,28 +5,29 @@ const { useState, useRef, useEffect } = React;
 const KAKAO_STEPS = [
   {
     num: 1,
-    title: "채팅방 열기",
-    desc: "카카오톡에서 랭킹에 넣고 싶은 친구와의 채팅방을 열어요.",
-    tip: "1:1 채팅방, 단체 채팅방 모두 돼요.",
+    title: "비교할 친구 정하기",
+    desc: "랭킹에 올릴 친구들을 정해요. 각 친구마다 채팅방에서 파일을 하나씩 꺼내야 해요.",
+    tip: "친구가 많을수록 랭킹이 정확해요. 5명 이상 추천!",
   },
   {
     num: 2,
-    title: "우측 상단 ☰ 탭하기",
-    desc: "채팅방 오른쪽 위 ☰ 버튼을 탭하고, 아래로 내려서 '채팅방 설정'을 탭해요.",
-    tip: "안드로이드는 화면 아래 메뉴에 있을 수 있어요.",
+    title: "채팅방 열고 ☰ 탭하기",
+    desc: "친구와의 채팅방을 열고 오른쪽 위 ☰ 버튼 → 아래로 내려서 '채팅방 설정'을 탭해요.",
+    tip: "안드로이드는 화면 아래 메뉴에 ☰가 있을 수 있어요.",
   },
   {
     num: 3,
     title: "'대화 내보내기' 탭하기",
-    desc: "'대화 내보내기'를 탭하고 '내 파일에 저장' 또는 '파일로 저장'을 선택해요.",
-    tip: "사진·동영상 포함 여부는 아무거나 선택해도 괜찮아요.",
+    desc: "'대화 내보내기' → '내 파일에 저장'을 탭해요. 비교할 친구 수만큼 반복해요.",
+    tip: "사진·동영상 포함 여부는 아무거나 선택해도 돼요.",
   },
   {
     num: 4,
-    title: "저장된 파일 올리기",
-    desc: "방금 저장한 카카오톡 대화 파일을 아래 버튼으로 올려요. 파일 이름이 'KakaoTalk_날짜'로 시작해요.",
-    tip: "파일이 안 보이면 스마트폰 '내 파일 앱 → 다운로드 폴더'를 확인해보세요.",
+    title: "파일 모두 한 번에 올리기",
+    desc: "내보낸 파일들을 모두 선택해서 아래 버튼으로 올려요. 여러 파일을 한 번에 선택해도 돼요.",
+    tip: "파일이 안 보이면 '내 파일 앱 → 다운로드 폴더'를 확인해보세요.",
     isUploadStep: true,
+    multiple: true,
   },
 ];
 
@@ -58,8 +59,8 @@ const INSTA_STEPS = [
   {
     num: 5,
     title: "이메일로 받기",
-    desc: "파일 준비가 되면 Instagram에서 이메일로 알려줘요. 이메일의 다운로드 링크를 탭하면 파일이 스마트폰에 저장돼요.",
-    tip: "스팸 메일함도 확인해보세요. 계정 크기에 따라 수 분~수 시간이 걸릴 수 있어요.",
+    desc: "파일 준비가 되면 Instagram에서 이메일로 알려줘요. 이메일의 다운로드 링크를 탭하면 파일이 저장돼요.",
+    tip: "스팸 메일함도 확인해보세요. 계정 크기에 따라 수 분~수 시간 걸릴 수 있어요.",
   },
   {
     num: 6,
@@ -107,16 +108,90 @@ function InstaLogo({ size = 20 }) {
   );
 }
 
-function StepGuide({ steps, accentColor, accentBg, file, onSelect, accept, isMobile }) {
-  const [current, setCurrent] = useState(0);
+function MultiFileZone({ files, onAdd, onRemove, accentColor, accentBg }) {
   const ref = useRef();
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      {files.length > 0 && (
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {files.map((f, i) => (
+            <div key={i} style={{
+              display: "flex", alignItems: "center", gap: 8,
+              padding: "8px 12px", background: "#f0fdf4",
+              border: "1.5px solid #22c55e", borderRadius: "var(--radius-md)",
+            }}>
+              <span style={{ fontSize: 14 }}>✅</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 12, fontWeight: 700, color: "#15803d", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</div>
+              </div>
+              <button onClick={() => onRemove(i)} style={{
+                background: "none", border: "none", cursor: "pointer",
+                fontSize: 14, color: "#94a3b8", padding: "2px 4px",
+              }}>✕</button>
+            </div>
+          ))}
+        </div>
+      )}
+      <button
+        onClick={() => ref.current.click()}
+        style={{
+          width: "100%", padding: "12px", border: `2px dashed ${accentColor}`,
+          borderRadius: "var(--radius-lg)", background: accentBg,
+          cursor: "pointer", fontFamily: "var(--font-body)",
+          fontSize: 13, fontWeight: 700, color: "#92400e",
+        }}
+      >
+        {files.length === 0 ? "파일 선택하기" : `+ 친구 추가 (현재 ${files.length}명)`}
+      </button>
+      <input
+        ref={ref} type="file" accept=".txt" multiple style={{ display: "none" }}
+        onChange={e => { onAdd(Array.from(e.target.files)); e.target.value = ""; }}
+      />
+    </div>
+  );
+}
+
+function SingleFileZone({ file, onSelect, accentColor, accentBg }) {
+  const ref = useRef();
+  return (
+    <div>
+      {file ? (
+        <div style={{
+          display: "flex", alignItems: "center", gap: 10,
+          padding: "12px 14px", background: "#f0fdf4",
+          border: "1.5px solid #22c55e", borderRadius: "var(--radius-lg)",
+        }}>
+          <span style={{ fontSize: 20 }}>✅</span>
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <div style={{ fontSize: 13, fontWeight: 700, color: "#15803d", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</div>
+            <div style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{(file.size / 1024).toFixed(1)} KB</div>
+          </div>
+          <Button variant="secondary" size="sm" onClick={() => ref.current.click()}>교체</Button>
+        </div>
+      ) : (
+        <button
+          onClick={() => ref.current.click()}
+          style={{
+            width: "100%", padding: "14px", border: `2px dashed ${accentColor}`,
+            borderRadius: "var(--radius-lg)", background: accentBg,
+            cursor: "pointer", fontFamily: "var(--font-body)",
+            fontSize: 14, fontWeight: 700, color: "#9d174d",
+          }}
+        >파일 선택하기</button>
+      )}
+      <input ref={ref} type="file" accept=".json" style={{ display: "none" }} onChange={e => onSelect(e.target.files[0])} />
+    </div>
+  );
+}
+
+function StepGuide({ steps, accentColor, accentBg, files, file, onAddFiles, onRemoveFile, onSelectFile }) {
+  const [current, setCurrent] = useState(0);
   const step = steps[current];
   const total = steps.length;
   const isLast = current === total - 1;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-      {/* 진행 바 */}
       <div style={{ display: "flex", gap: 4, padding: "14px 16px 0" }}>
         {steps.map((s, i) => (
           <div
@@ -131,8 +206,7 @@ function StepGuide({ steps, accentColor, accentBg, file, onSelect, accept, isMob
         ))}
       </div>
 
-      {/* 단계 콘텐츠 */}
-      <div style={{ padding: "16px 16px 0", minHeight: 160 }}>
+      <div style={{ padding: "16px 16px 0", minHeight: 150 }}>
         <div style={{ fontSize: 11, fontWeight: 700, color: accentColor === "#f59e0b" ? "#92400e" : "#9d174d", marginBottom: 6 }}>
           STEP {step.num} / {total}
         </div>
@@ -153,40 +227,15 @@ function StepGuide({ steps, accentColor, accentBg, file, onSelect, accept, isMob
         )}
       </div>
 
-      {/* 업로드 존 (마지막 스텝에만) */}
       {step.isUploadStep && (
         <div style={{ padding: "14px 16px 0" }}>
-          {file ? (
-            <div style={{
-              display: "flex", alignItems: "center", gap: 10,
-              padding: "12px 14px", background: "var(--mint-100)",
-              border: "1.5px solid var(--color-success)", borderRadius: "var(--radius-lg)",
-            }}>
-              <span style={{ fontSize: 20 }}>✅</span>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-success)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</div>
-                <div style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{(file.size / 1024).toFixed(1)} KB</div>
-              </div>
-              <Button variant="secondary" size="sm" onClick={() => ref.current.click()}>교체</Button>
-            </div>
-          ) : (
-            <button
-              onClick={() => ref.current.click()}
-              style={{
-                width: "100%", padding: "14px", border: `2px dashed ${accentColor}`,
-                borderRadius: "var(--radius-lg)", background: accentBg,
-                cursor: "pointer", fontFamily: "var(--font-body)",
-                fontSize: 14, fontWeight: 700, color: accentColor === "#f59e0b" ? "#92400e" : "#9d174d",
-              }}
-            >
-              파일 선택하기
-            </button>
-          )}
-          <input ref={ref} type="file" accept={accept} style={{ display: "none" }} onChange={e => onSelect(e.target.files[0])} />
+          {step.multiple
+            ? <MultiFileZone files={files || []} onAdd={onAddFiles} onRemove={onRemoveFile} accentColor={accentColor} accentBg={accentBg} />
+            : <SingleFileZone file={file} onSelect={onSelectFile} accentColor={accentColor} accentBg={accentBg} />
+          }
         </div>
       )}
 
-      {/* 이전 / 다음 버튼 */}
       <div style={{ display: "flex", justifyContent: "space-between", padding: "14px 16px 16px", gap: 8 }}>
         <button
           onClick={() => setCurrent(c => Math.max(0, c - 1))}
@@ -216,10 +265,9 @@ function StepGuide({ steps, accentColor, accentBg, file, onSelect, accept, isMob
   );
 }
 
-function PlatformSection({ platform, file, onSelect, error, isMobile }) {
+function PlatformSection({ platform, files, file, onAddFiles, onRemoveFile, onSelectFile, error }) {
   const isKakao = platform === "kakao";
   const steps = isKakao ? KAKAO_STEPS : INSTA_STEPS;
-  const accept = isKakao ? ".txt" : ".json";
   const accentColor = isKakao ? "#f59e0b" : "#e1306c";
   const accentBg = isKakao ? "#fef3c7" : "#fce7f0";
   const LogoIcon = isKakao ? KakaoLogo : InstaLogo;
@@ -229,7 +277,6 @@ function PlatformSection({ platform, file, onSelect, error, isMobile }) {
       background: "var(--surface-card)", border: "1px solid var(--border-soft)",
       borderRadius: "var(--radius-xl)", overflow: "hidden",
     }}>
-      {/* 헤더 */}
       <div style={{
         padding: "12px 16px", background: accentBg,
         display: "flex", alignItems: "center", gap: 10,
@@ -242,7 +289,7 @@ function PlatformSection({ platform, file, onSelect, error, isMobile }) {
           </div>
           <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
             {isKakao
-              ? `총 ${KAKAO_STEPS.length}단계 · 채팅방에서 파일 꺼내기`
+              ? `총 ${KAKAO_STEPS.length}단계 · 친구마다 채팅방 파일 하나씩`
               : `총 ${INSTA_STEPS.length}단계 · 인스타 설정에서 대화 파일 받기`}
           </div>
         </div>
@@ -252,10 +299,11 @@ function PlatformSection({ platform, file, onSelect, error, isMobile }) {
         steps={steps}
         accentColor={accentColor}
         accentBg={accentBg}
+        files={files}
         file={file}
-        onSelect={onSelect}
-        accept={accept}
-        isMobile={isMobile}
+        onAddFiles={onAddFiles}
+        onRemoveFile={onRemoveFile}
+        onSelectFile={onSelectFile}
       />
 
       {error && (
@@ -273,25 +321,32 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
   const showKakao = choice === "kakao";
   const showInsta = choice === "insta";
 
-  const [kakaoFile, setKakaoFile] = useState(null);
+  const [kakaoFiles, setKakaoFiles] = useState([]);
   const [instaFile, setInstaFile] = useState(null);
   const [kakaoError, setKakaoError] = useState("");
   const [instaError, setInstaError] = useState("");
 
-  function handleKakao(file) {
-    if (!file) return;
-    if (!file.name.toLowerCase().endsWith(".txt")) {
-      setKakaoError("카카오톡 파일은 .txt 형식이어야 해요");
+  function handleAddKakao(newFiles) {
+    const invalid = newFiles.filter(f => !f.name.toLowerCase().endsWith(".txt"));
+    if (invalid.length > 0) {
+      setKakaoError("카카오톡 대화 내보내기 파일만 선택해주세요");
       return;
     }
     setKakaoError("");
-    setKakaoFile(file);
+    setKakaoFiles(prev => {
+      const existingNames = new Set(prev.map(f => f.name));
+      return [...prev, ...newFiles.filter(f => !existingNames.has(f.name))];
+    });
+  }
+
+  function handleRemoveKakao(index) {
+    setKakaoFiles(prev => prev.filter((_, i) => i !== index));
   }
 
   function handleInsta(file) {
     if (!file) return;
     if (!file.name.toLowerCase().endsWith(".json")) {
-      setInstaError("인스타그램 파일은 .json 형식이어야 해요");
+      setInstaError("인스타에서 내려받은 대화 파일을 선택해주세요");
       return;
     }
     setInstaError("");
@@ -299,17 +354,16 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
   }
 
   function handleStart() {
-    setAppData(prev => ({ ...prev, kakaoFile, instaFile, isDemo: false }));
+    setAppData(prev => ({ ...prev, kakaoFiles, instaFile, isDemo: false }));
     onNavigate("analyzing");
   }
 
   function handleDemo() {
-    setAppData(prev => ({ ...prev, kakaoFile: null, instaFile: null, isDemo: true }));
+    setAppData(prev => ({ ...prev, kakaoFiles: [], instaFile: null, isDemo: true }));
     onNavigate("analyzing");
   }
 
-  const canStart = (showKakao && kakaoFile) || (showInsta && instaFile);
-  const platformLabel = choice === "kakao" ? "카카오톡" : "인스타그램";
+  const canStart = (showKakao && kakaoFiles.length > 0) || (showInsta && instaFile);
 
   return (
     <AppShell activeNav="upload" onNavigate={onNavigate}>
@@ -319,7 +373,7 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
             파일 올리기
           </h2>
           <p style={{ fontSize: 13, color: "var(--text-secondary)", margin: "4px 0 0" }}>
-            <strong>{platformLabel}</strong> 파일 꺼내는 법을 단계별로 안내해드려요
+            {showKakao ? "친구마다 채팅방 파일을 하나씩 꺼내서 한 번에 올려요" : "인스타 설정에서 대화 파일 받는 법을 안내해드려요"}
           </p>
         </div>
         <Button variant="default" size="sm" onClick={() => onNavigate("onboarding")}>← 다시 선택</Button>
@@ -328,27 +382,22 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
       {showKakao && (
         <PlatformSection
           platform="kakao"
-          file={kakaoFile}
-          onSelect={handleKakao}
+          files={kakaoFiles}
+          onAddFiles={handleAddKakao}
+          onRemoveFile={handleRemoveKakao}
           error={kakaoError}
-          isMobile={isMobile}
         />
       )}
       {showInsta && (
         <PlatformSection
           platform="insta"
           file={instaFile}
-          onSelect={handleInsta}
+          onSelectFile={handleInsta}
           error={instaError}
-          isMobile={isMobile}
         />
       )}
 
-      <div style={{
-        display: "flex", alignItems: "center",
-        justifyContent: "space-between",
-        gap: 12,
-      }}>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
         <button
           onClick={handleDemo}
           style={{
@@ -364,7 +413,9 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
           onClick={canStart ? handleStart : undefined}
           style={{ opacity: canStart ? 1 : 0.4 }}
         >
-          {canStart ? "분석 시작 →" : "파일을 먼저 선택해주세요"}
+          {canStart
+            ? showKakao ? `${kakaoFiles.length}명 분석 시작 →` : "분석 시작 →"
+            : "파일을 먼저 선택해주세요"}
         </Button>
       </div>
     </AppShell>

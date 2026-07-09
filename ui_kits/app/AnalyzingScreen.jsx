@@ -43,7 +43,7 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
 
   async function runAnalysis() {
     try {
-      const { parseKakaoTalk, parseInstagram, computeRankings, getDemoData } = window.DataParser;
+      const { parseKakaoFile, parseInstagram, computeRankings, getDemoData } = window.DataParser;
 
       advance(0, 15);
       await delay(400);
@@ -52,17 +52,21 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
       let instaData = null;
 
       if (appData.isDemo) {
-        // Use built-in demo data
         advance(1, 40);
         await delay(600);
         const demo = getDemoData();
         kakaoData = demo.kakao;
         instaData = demo.insta;
       } else {
-        if (appData.kakaoFile) {
+        // KakaoTalk: multiple files, one per friend's chat room
+        if (appData.kakaoFiles && appData.kakaoFiles.length > 0) {
           advance(1, 30);
-          const text = await readFileAsText(appData.kakaoFile);
-          kakaoData = parseKakaoTalk(text);
+          kakaoData = {};
+          for (const file of appData.kakaoFiles) {
+            const text = await readFileAsText(file);
+            const { friendName, count } = parseKakaoFile(file.name, text);
+            kakaoData[friendName] = (kakaoData[friendName] || 0) + count;
+          }
         }
         if (appData.instaFile) {
           advance(1, 55);
