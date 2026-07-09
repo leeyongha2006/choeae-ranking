@@ -80,15 +80,24 @@
   const RANK_MEDALS = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"];
 
   function computeRankings(kakaoData, instaData, myName) {
-    const combined = {};
+    const kakao = kakaoData || {};
+    const insta = instaData || {};
 
-    for (const [name, cnt] of Object.entries(kakaoData || {})) {
-      if (name === myName) continue;
-      combined[name] = (combined[name] || 0) + cnt;
-    }
-    for (const [name, cnt] of Object.entries(instaData || {})) {
-      if (name === myName) continue;
-      combined[name] = (combined[name] || 0) + cnt * 2;
+    // 내 이름 제외한 모든 친구 목록
+    const names = new Set([
+      ...Object.keys(kakao).filter(n => n !== myName),
+      ...Object.keys(insta).filter(n => n !== myName),
+    ]);
+
+    // 각 플랫폼별 최댓값 (정규화 기준)
+    const kakaoMax = Math.max(1, ...Object.entries(kakao).filter(([n]) => n !== myName).map(([, v]) => v));
+    const instaMax = Math.max(1, ...Object.entries(insta).filter(([n]) => n !== myName).map(([, v]) => v));
+
+    const combined = {};
+    for (const name of names) {
+      const kakaoNorm = ((kakao[name] || 0) / kakaoMax) * 100;
+      const instaNorm = ((insta[name] || 0) / instaMax) * 100;
+      combined[name] = kakaoNorm + instaNorm * 2;
     }
 
     const sorted = Object.entries(combined)
@@ -97,10 +106,10 @@
         rank: i + 1,
         medal: RANK_MEDALS[i] || `${i + 1}`,
         name,
-        score,
-        kakaoCount: kakaoData?.[name] || 0,
-        instaCount: instaData?.[name] || 0,
-        avgResponseMin: Math.floor(Math.random() * 20 + 2), // cosmetic placeholder
+        score: Math.round(score),
+        kakaoCount: kakao[name] || 0,
+        instaCount: insta[name] || 0,
+        avgResponseMin: Math.floor(Math.random() * 20 + 2),
         delta: i === 0 ? "—" : i % 2 === 0 ? `▲ ${i}` : `▼ ${i - 1}`,
       }));
 
