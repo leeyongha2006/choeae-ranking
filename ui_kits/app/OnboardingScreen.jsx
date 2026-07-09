@@ -35,21 +35,15 @@ const PLATFORMS = [
     key: "kakao",
     logo: () => <KakaoLogo />,
     label: "카카오톡",
-    tag: "가장 정확해요",
-    tagColor: "#92400e",
-    tagBg: "#fef3c7",
-    desc: "대화 횟수·응답 속도로 진짜 친한 친구를 찾아요",
-    sub: ".txt 파일 1개부터 OK",
+    desc: "누구랑 얼마나 많이 대화했는지로 친한 순서를 뽑아요",
+    sub: "채팅방에서 파일 꺼내면 바로 OK",
   },
   {
     key: "insta",
     logo: () => <InstaLogo />,
     label: "인스타그램",
-    tag: "SNS 친밀도",
-    tagColor: "#9d174d",
-    tagBg: "#fce7f3",
-    desc: "좋아요·댓글·DM으로 SNS에서 제일 친한 친구를 찾아요",
-    sub: "데이터 요청 후 1~3일 소요",
+    desc: "DM, 게시물 좋아요, 댓글로 제일 자주 소통한 친구를 찾아요",
+    sub: "인스타 설정에서 파일 받는 데 1~3일 걸려요",
   },
 ];
 
@@ -118,14 +112,10 @@ function OnboardingScreen({ onNavigate, appData, setAppData }) {
                 )}
                 <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                   <Logo />
-                  <span style={{
-                    fontSize: 10, fontWeight: 700, padding: "2px 7px",
-                    borderRadius: "var(--radius-pill)", background: p.tagBg, color: p.tagColor,
-                  }}>{p.tag}</span>
+                  <span style={{ fontWeight: 800, fontSize: 14, color: "var(--text-primary)" }}>{p.label}</span>
                 </div>
-                <div style={{ fontWeight: 800, fontSize: 14, color: "var(--text-primary)" }}>{p.label}</div>
-                <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.4 }}>{p.desc}</div>
-                <div style={{ fontSize: 10, color: "var(--text-tertiary)", marginTop: 2 }}>{p.sub}</div>
+                <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.5, marginTop: 4 }}>{p.desc}</div>
+                <div style={{ fontSize: 11, color: "var(--text-tertiary)", marginTop: 4 }}>{p.sub}</div>
               </div>
             );
           })}
