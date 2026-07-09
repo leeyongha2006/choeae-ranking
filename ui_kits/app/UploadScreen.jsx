@@ -3,17 +3,71 @@ const { Button } = window.DesignSystem_8db18d;
 const { useState, useRef, useEffect } = React;
 
 const KAKAO_STEPS = [
-  { num: "1", title: "채팅방 열기", desc: "랭킹에 넣고 싶은 친구와의 채팅방을 열어요", tip: "1:1, 단체 채팅방 모두 OK" },
-  { num: "2", title: "우측 메뉴 → 채팅방 설정", desc: "화면 우측 상단 ☰ 아이콘을 눌러요", tip: "Android는 하단 메뉴에 있을 수 있어요" },
-  { num: "3", title: "대화 내보내기", desc: "'대화 내보내기' → '내 파일에 저장' 선택", tip: "미디어 포함 여부는 아무거나 선택해도 돼요" },
-  { num: "4", title: ".txt 파일 올리기", desc: "저장된 KakaoTalk_날짜.txt 파일을 아래에 올려요", tip: "파일이 안 보이면 내 파일 앱 → Download 폴더 확인" },
+  {
+    num: 1,
+    title: "채팅방 열기",
+    desc: "카카오톡 앱에서 랭킹에 넣고 싶은 친구와의 채팅방을 열어요.",
+    tip: "1:1 채팅방과 단체 채팅방 모두 가능해요.",
+  },
+  {
+    num: 2,
+    title: "채팅방 설정 열기",
+    desc: "화면 우측 상단의 ☰ 아이콘을 탭한 뒤 '채팅방 설정'을 탭해요.",
+    tip: "Android는 하단 메뉴에 ☰ 아이콘이 있을 수 있어요.",
+  },
+  {
+    num: 3,
+    title: "대화 내보내기",
+    desc: "'대화 내보내기'를 탭하고 '내 파일에 저장' 또는 '파일로 저장'을 선택해요.",
+    tip: "미디어 포함 여부는 어떻게 선택해도 관계없어요.",
+  },
+  {
+    num: 4,
+    title: ".txt 파일 올리기",
+    desc: "저장된 KakaoTalk_날짜.txt 파일을 찾아 아래 업로드 버튼으로 올려요.",
+    tip: "파일이 안 보이면 '내 파일 앱 → Download 폴더'를 확인해보세요.",
+    isUploadStep: true,
+  },
 ];
 
 const INSTA_STEPS = [
-  { num: "1", title: "인스타 설정 열기", desc: "프로필 → 우측 상단 ☰ → '설정 및 활동' 탭", tip: null },
-  { num: "2", title: "정보 다운로드 요청", desc: "'내 활동' → '정보 다운로드' → 형식을 JSON으로 선택!", tip: "형식을 꼭 JSON으로 바꿔주세요 (기본값이 HTML이에요)" },
-  { num: "3", title: "이메일로 받기", desc: "1~3일 내 이메일로 다운로드 링크가 와요", tip: "스팸함도 확인해보세요" },
-  { num: "4", title: "message_1.json 올리기", desc: "압축 해제 → messages → inbox → 친구이름 폴더 안 파일", tip: "친구별 폴더가 따로 있어요. 여러 파일 올릴수록 정확해요!" },
+  {
+    num: 1,
+    title: "설정 열기",
+    desc: "프로필 탭 → 우측 상단 ☰ 탭 → '설정'을 탭해요.",
+    tip: null,
+  },
+  {
+    num: 2,
+    title: "계정 센터 열기",
+    desc: "'설정' 화면 하단의 '계정 센터'를 탭해요.",
+    tip: "Meta 계정 센터로 이동해요.",
+  },
+  {
+    num: 3,
+    title: "내 정보 다운로드",
+    desc: "'내 정보 및 권한' → '내 정보 다운로드' → '정보 다운로드 또는 전송'을 탭해요.",
+    tip: null,
+  },
+  {
+    num: 4,
+    title: "JSON 형식 선택",
+    desc: "계정 선택 → '사용 가능한 모든 정보' → '기기에 다운로드' → 형식을 'JSON'으로 바꾼 뒤 '파일 만들기'를 탭해요.",
+    tip: "형식이 기본값 HTML로 되어있어요. 반드시 JSON으로 바꿔주세요!",
+  },
+  {
+    num: 5,
+    title: "이메일로 받기",
+    desc: "파일 준비가 완료되면 Instagram에서 이메일로 알림이 와요. 링크를 탭해 ZIP 파일을 다운로드하세요.",
+    tip: "스팸 폴더도 확인해보세요. 계정 크기에 따라 수 분~수 시간 걸릴 수 있어요.",
+  },
+  {
+    num: 6,
+    title: "message_1.json 올리기",
+    desc: "ZIP 파일 압축 해제 → messages → inbox → 친구이름 폴더 안의 message_1.json 파일을 올려요.",
+    tip: "친구마다 폴더가 따로 있어요.",
+    isUploadStep: true,
+  },
 ];
 
 function useIsMobile() {
@@ -53,90 +107,122 @@ function InstaLogo({ size = 20 }) {
   );
 }
 
-function MiniStep({ step }) {
+function StepGuide({ steps, accentColor, accentBg, file, onSelect, accept, isMobile }) {
+  const [current, setCurrent] = useState(0);
+  const ref = useRef();
+  const step = steps[current];
+  const total = steps.length;
+  const isLast = current === total - 1;
+
   return (
-    <div style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
-      <div style={{
-        width: 22, height: 22, borderRadius: "50%", flexShrink: 0, marginTop: 1,
-        background: "var(--gradient-holo)", display: "flex", alignItems: "center",
-        justifyContent: "center", fontSize: 11, fontWeight: 800, color: "#fff",
-      }}>{step.num}</div>
-      <div style={{ display: "flex", flexDirection: "column", gap: 2, minWidth: 0 }}>
-        <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text-primary)" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
+      {/* 진행 바 */}
+      <div style={{ display: "flex", gap: 4, padding: "14px 16px 0" }}>
+        {steps.map((s, i) => (
+          <div
+            key={i}
+            onClick={() => setCurrent(i)}
+            style={{
+              flex: 1, height: 3, borderRadius: 99, cursor: "pointer",
+              background: i <= current ? accentColor : "var(--border-soft)",
+              transition: "background 200ms",
+            }}
+          />
+        ))}
+      </div>
+
+      {/* 단계 콘텐츠 */}
+      <div style={{ padding: "16px 16px 0", minHeight: 160 }}>
+        <div style={{ fontSize: 11, fontWeight: 700, color: accentColor === "#f59e0b" ? "#92400e" : "#9d174d", marginBottom: 6 }}>
+          STEP {step.num} / {total}
+        </div>
+        <div style={{ fontWeight: 800, fontSize: 16, color: "var(--text-primary)", marginBottom: 8 }}>
           {step.title}
-        </span>
-        <span style={{ fontSize: 11, color: "var(--text-secondary)", lineHeight: 1.4 }}>{step.desc}</span>
+        </div>
+        <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.6 }}>
+          {step.desc}
+        </div>
         {step.tip && (
-          <span style={{
-            fontSize: 10, color: "var(--violet-600)", background: "var(--violet-100)",
-            borderRadius: "var(--radius-sm)", padding: "2px 6px", display: "inline-block", marginTop: 1,
-          }}>💡 {step.tip}</span>
+          <div style={{
+            marginTop: 10, padding: "8px 12px",
+            background: accentBg, borderRadius: "var(--radius-md)",
+            fontSize: 12, color: "var(--text-primary)", lineHeight: 1.5,
+          }}>
+            💡 {step.tip}
+          </div>
         )}
+      </div>
+
+      {/* 업로드 존 (마지막 스텝에만) */}
+      {step.isUploadStep && (
+        <div style={{ padding: "14px 16px 0" }}>
+          {file ? (
+            <div style={{
+              display: "flex", alignItems: "center", gap: 10,
+              padding: "12px 14px", background: "var(--mint-100)",
+              border: "1.5px solid var(--color-success)", borderRadius: "var(--radius-lg)",
+            }}>
+              <span style={{ fontSize: 20 }}>✅</span>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <div style={{ fontSize: 13, fontWeight: 700, color: "var(--color-success)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{file.name}</div>
+                <div style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{(file.size / 1024).toFixed(1)} KB</div>
+              </div>
+              <Button variant="secondary" size="sm" onClick={() => ref.current.click()}>교체</Button>
+            </div>
+          ) : (
+            <button
+              onClick={() => ref.current.click()}
+              style={{
+                width: "100%", padding: "14px", border: `2px dashed ${accentColor}`,
+                borderRadius: "var(--radius-lg)", background: accentBg,
+                cursor: "pointer", fontFamily: "var(--font-body)",
+                fontSize: 14, fontWeight: 700, color: accentColor === "#f59e0b" ? "#92400e" : "#9d174d",
+              }}
+            >
+              파일 선택하기
+            </button>
+          )}
+          <input ref={ref} type="file" accept={accept} style={{ display: "none" }} onChange={e => onSelect(e.target.files[0])} />
+        </div>
+      )}
+
+      {/* 이전 / 다음 버튼 */}
+      <div style={{ display: "flex", justifyContent: "space-between", padding: "14px 16px 16px", gap: 8 }}>
+        <button
+          onClick={() => setCurrent(c => Math.max(0, c - 1))}
+          disabled={current === 0}
+          style={{
+            flex: 1, padding: "10px", border: "1.5px solid var(--border-soft)",
+            borderRadius: "var(--radius-md)", background: "none",
+            fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 700,
+            color: current === 0 ? "var(--text-tertiary)" : "var(--text-primary)",
+            cursor: current === 0 ? "default" : "pointer",
+          }}
+        >← 이전</button>
+        <button
+          onClick={() => !isLast && setCurrent(c => c + 1)}
+          disabled={isLast}
+          style={{
+            flex: 2, padding: "10px",
+            border: "none", borderRadius: "var(--radius-md)",
+            background: isLast ? "var(--surface-sunken)" : accentColor === "#f59e0b" ? "#FEE500" : "linear-gradient(135deg, #f09433, #bc1888)",
+            fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 700,
+            color: isLast ? "var(--text-tertiary)" : accentColor === "#f59e0b" ? "#3C1E1E" : "#fff",
+            cursor: isLast ? "default" : "pointer",
+          }}
+        >{isLast ? "파일을 선택해주세요" : "다음 →"}</button>
       </div>
     </div>
   );
 }
 
 function PlatformSection({ platform, file, onSelect, error, isMobile }) {
-  const ref = useRef();
-  const [dragging, setDragging] = useState(false);
   const isKakao = platform === "kakao";
   const steps = isKakao ? KAKAO_STEPS : INSTA_STEPS;
   const accept = isKakao ? ".txt" : ".json";
   const accentColor = isKakao ? "#f59e0b" : "#e1306c";
   const accentBg = isKakao ? "#fef3c7" : "#fce7f0";
-  const hint = isKakao ? "KakaoTalk_날짜.txt" : "message_1.json";
   const LogoIcon = isKakao ? KakaoLogo : InstaLogo;
-
-  function handleDrop(e) {
-    e.preventDefault();
-    setDragging(false);
-    const f = e.dataTransfer.files[0];
-    if (f) onSelect(f);
-  }
-
-  const dropZone = (
-    <div
-      onClick={() => ref.current.click()}
-      onDragOver={e => { e.preventDefault(); setDragging(true); }}
-      onDragLeave={() => setDragging(false)}
-      onDrop={handleDrop}
-      style={{
-        border: `2px dashed ${dragging ? accentColor : file ? "var(--color-success)" : "var(--border-strong)"}`,
-        borderRadius: "var(--radius-lg)",
-        padding: isMobile ? "20px 16px" : "24px 16px",
-        display: "flex", flexDirection: "column", alignItems: "center", gap: 8,
-        cursor: "pointer", textAlign: "center",
-        background: file ? "var(--mint-100)" : dragging ? accentBg : "var(--surface-sunken)",
-        transition: "all 200ms var(--ease-out)",
-      }}
-    >
-      {file ? <span style={{ fontSize: isMobile ? 28 : 32 }}>✅</span> : <LogoIcon size={isMobile ? 28 : 32} />}
-      {file ? (
-        <>
-          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--color-success)", wordBreak: "break-all" }}>{file.name}</span>
-          <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>{(file.size / 1024).toFixed(1)} KB</span>
-          <Button variant="secondary" size="sm" onClick={e => { e.stopPropagation(); ref.current.click(); }}>파일 교체</Button>
-        </>
-      ) : (
-        <>
-          <span style={{ fontSize: 12, color: "var(--text-tertiary)" }}>{hint}</span>
-          <Button variant="secondary" size="sm" onClick={e => { e.stopPropagation(); ref.current.click(); }}>파일 선택</Button>
-          {!isMobile && <span style={{ fontSize: 10, color: "var(--text-tertiary)" }}>또는 여기에 드래그</span>}
-        </>
-      )}
-      <input ref={ref} type="file" accept={accept} style={{ display: "none" }} onChange={e => onSelect(e.target.files[0])} />
-    </div>
-  );
-
-  const guideSteps = (
-    <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-      <div style={{ fontSize: 11, fontWeight: 700, color: "var(--text-tertiary)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
-        파일 꺼내는 법
-      </div>
-      {steps.map(s => <MiniStep key={s.num} step={s} />)}
-    </div>
-  );
 
   return (
     <div style={{
@@ -155,29 +241,25 @@ function PlatformSection({ platform, file, onSelect, error, isMobile }) {
             {isKakao ? "카카오톡" : "인스타그램"} 파일 올리기
           </div>
           <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-            {isKakao ? "채팅방 → 대화 내보내기 → .txt 파일" : "설정 → 정보 다운로드 → .json 파일"}
+            {isKakao
+              ? `총 ${KAKAO_STEPS.length}단계 · 채팅방에서 .txt 파일 내보내기`
+              : `총 ${INSTA_STEPS.length}단계 · 설정에서 .json 파일 다운로드`}
           </div>
         </div>
       </div>
 
-      {isMobile ? (
-        /* 모바일: 세로 스택 (업로드 존 → 가이드) */
-        <div style={{ padding: "16px", display: "flex", flexDirection: "column", gap: 16 }}>
-          {dropZone}
-          {error && <div style={{ fontSize: 11, color: "var(--color-danger)" }}>⚠️ {error}</div>}
-          {guideSteps}
-        </div>
-      ) : (
-        /* 데스크톱: 좌우 분할 */
-        <div style={{ display: "flex" }}>
-          <div style={{ flex: "0 0 220px", padding: "16px", borderRight: "1px solid var(--border-soft)" }}>
-            {dropZone}
-            {error && <div style={{ fontSize: 11, color: "var(--color-danger)", marginTop: 6 }}>⚠️ {error}</div>}
-          </div>
-          <div style={{ flex: 1, padding: "16px 20px" }}>
-            {guideSteps}
-          </div>
-        </div>
+      <StepGuide
+        steps={steps}
+        accentColor={accentColor}
+        accentBg={accentBg}
+        file={file}
+        onSelect={onSelect}
+        accept={accept}
+        isMobile={isMobile}
+      />
+
+      {error && (
+        <div style={{ padding: "0 16px 12px", fontSize: 12, color: "var(--color-danger)" }}>⚠️ {error}</div>
       )}
     </div>
   );
@@ -231,65 +313,58 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
 
   return (
     <AppShell activeNav="upload" onNavigate={onNavigate}>
-      {/* 상단 */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
         <div>
           <h2 style={{ fontFamily: "var(--font-display)", fontSize: isMobile ? 22 : 26, color: "var(--ink-900)", margin: 0 }}>
             파일 올리기
           </h2>
           <p style={{ fontSize: 13, color: "var(--text-secondary)", margin: "4px 0 0" }}>
-            <strong>{platformLabel}</strong> 파일을 올리면 바로 분석이 시작돼요
+            <strong>{platformLabel}</strong> 파일 꺼내는 법을 단계별로 안내해드려요
           </p>
         </div>
         <Button variant="default" size="sm" onClick={() => onNavigate("onboarding")}>← 다시 선택</Button>
       </div>
 
-      {/* 업로드 섹션들 */}
-      <div style={{ display: "flex", flexDirection: "column", gap: isMobile ? 12 : 16 }}>
-        {showKakao && (
-          <PlatformSection
-            platform="kakao"
-            file={kakaoFile}
-            onSelect={handleKakao}
-            error={kakaoError}
-            isMobile={isMobile}
-          />
-        )}
-        {showInsta && (
-          <PlatformSection
-            platform="insta"
-            file={instaFile}
-            onSelect={handleInsta}
-            error={instaError}
-            isMobile={isMobile}
-          />
-        )}
-      </div>
+      {showKakao && (
+        <PlatformSection
+          platform="kakao"
+          file={kakaoFile}
+          onSelect={handleKakao}
+          error={kakaoError}
+          isMobile={isMobile}
+        />
+      )}
+      {showInsta && (
+        <PlatformSection
+          platform="insta"
+          file={instaFile}
+          onSelect={handleInsta}
+          error={instaError}
+          isMobile={isMobile}
+        />
+      )}
 
-      {/* 하단 CTA */}
       <div style={{
         display: "flex", alignItems: "center",
-        justifyContent: isMobile ? "center" : "space-between",
-        flexDirection: isMobile ? "column" : "row",
+        justifyContent: "space-between",
         gap: 12,
       }}>
-        {!isMobile && (
-          <button
-            onClick={handleDemo}
-            style={{
-              fontSize: 13, color: "var(--text-tertiary)", background: "none",
-              border: "none", cursor: "pointer", textDecoration: "underline", fontFamily: "var(--font-body)",
-            }}
-          >
-            파일 없이 데모로 먼저 볼게요
-          </button>
-        )}
+        <button
+          onClick={handleDemo}
+          style={{
+            fontSize: 13, color: "var(--text-tertiary)", background: "none",
+            border: "none", cursor: "pointer", textDecoration: "underline",
+            fontFamily: "var(--font-body)",
+          }}
+        >
+          데모로 먼저 볼게요
+        </button>
         <Button
           variant="primary" size="lg"
-          onClick={canStart ? handleStart : handleDemo}
-          style={{ width: isMobile ? "100%" : "auto", opacity: 1 }}
+          onClick={canStart ? handleStart : undefined}
+          style={{ opacity: canStart ? 1 : 0.4 }}
         >
-          {canStart ? "분석 시작 →" : "데모로 먼저 볼게요"}
+          {canStart ? "분석 시작 →" : "파일을 먼저 선택해주세요"}
         </Button>
       </div>
     </AppShell>
