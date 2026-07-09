@@ -1,0 +1,82 @@
+/* ──────────────────────────────────────────────────────────────
+   최애친구랭킹 — Color tokens
+   Direction: "포토카드(포카)" holographic trading-card energy —
+   violet→pink→yellow foil gradient, warm off-white paper surfaces,
+   ink-plum text. A nod to KakaoTalk yellow + Instagram warmth as
+   the two data sources this product is built around, without
+   reproducing either brand's actual marks.
+   ────────────────────────────────────────────────────────────── */
+:root {
+  /* ---- base ink / paper ---- */
+  --ink-900: #1B1421;
+  --ink-700: #3D3450;
+  --ink-500: #6B6280;
+  --ink-300: #A79EBB;
+
+  --paper-0: #FFFBF5;   /* app canvas — warm off-white */
+  --paper-50: #FFFFFF;  /* card surface */
+  --paper-100: #F6F1FB; /* sunken / well */
+  --paper-200: #ECE3F5; /* soft border */
+  --paper-300: #D8CBEF; /* strong border */
+
+  /* ---- brand hues ---- */
+  --violet-700: #6423C4;
+  --violet-600: #7C3AED;
+  --violet-500: #9257FF;
+  --violet-100: #EEE3FF;
+
+  --pink-600: #E31C6C;
+  --pink-500: #FF3D81;
+  --pink-400: #FF6FA5;
+  --pink-100: #FFE1EC;
+
+  --yellow-500: #FFDA1A;
+  --yellow-400: #FFE812; /* kakao-adjacent accent, used sparingly */
+  --yellow-100: #FFF6C2;
+
+  --mint-500: #00C9AE;
+  --mint-400: #00E5C7;
+  --mint-100: #D4FBF3;
+
+  --orange-500: #FF7A45;
+  --orange-100: #FFE3D4;
+
+  /* ---- rank medals ---- */
+  --rank-gold: #FFD23F;
+  --rank-silver: #D9DFE5;
+  --rank-bronze: #E2965B;
+
+  /* ---- feedback ---- */
+  --color-success: #17B978;
+  --color-danger: #FF4D4F;
+  --color-warning: #FFB020;
+
+  /* ---- gradients ---- */
+  --gradient-holo: linear-gradient(135deg, #7C3AED 0%, #FF3D81 55%, #FFE812 100%); /* @kind color */
+  --gradient-holo-soft: linear-gradient(135deg, #EEE3FF 0%, #FFE1EC 55%, #FFF6C2 100%); /* @kind color */
+  --gradient-card-dark: linear-gradient(160deg, #2B1E42 0%, #150C21 100%); /* @kind color */
+  --gradient-mint-violet: linear-gradient(135deg, #00E5C7 0%, #7C3AED 100%); /* @kind color */
+
+  /* ---- semantic aliases ---- */
+  --color-primary: var(--violet-600);
+  --color-primary-hover: var(--violet-700);
+  --color-primary-press: #551EA8;
+  --color-accent: var(--pink-500);
+  --color-accent-hover: var(--pink-600);
+
+  --text-primary: var(--ink-900);
+  --text-secondary: var(--ink-500);
+  --text-tertiary: var(--ink-300);
+  --text-inverse: #FFFFFF;
+  --text-on-brand: #FFFFFF;
+
+  --surface-canvas: var(--paper-0);
+  --surface-card: var(--paper-50);
+  --surface-sunken: var(--paper-100);
+  --surface-dark: #180F26;
+  --surface-dark-2: #241A38;
+
+  --border-soft: var(--paper-200);
+  --border-strong: var(--paper-300);
+  --border-focus: var(--violet-500);
+}

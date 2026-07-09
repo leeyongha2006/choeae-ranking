@@ -1,0 +1,26 @@
+/* ──────────────────────────────────────────────────────────────
+   최애친구랭킹 — Web fonts
+   Source .fig only specified "Inter" (wireframe default). Per the
+   brief, the wireframe visuals were explicitly rejected as too plain
+   for a 20s–30s Korean audience, so this system introduces a real
+   Korean type identity. Real brand font files were not provided —
+   these are Google Fonts substitutions. FLAG TO USER: swap in actual
+   licensed brand fonts (e.g. Pretendard) if/when available.
+   ────────────────────────────────────────────────────────────── */
+
+@import url('https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gaegu:wght@400;700&family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap');
+
+:root {
+  /* Display / headline — chunky poster-style Korean display face.
+     Used for rank numbers, big headlines, share-card hero text. */
+  --font-display: "Black Han Sans", "Noto Sans KR", -apple-system, sans-serif;
+
+  /* UI / body — clean, highly legible at small sizes.
+     Substitute for Pretendard (not available as a Google Font) —
+     ask the user for real Pretendard files to swap in. */
+  --font-body: "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+
+  /* Playful accent — handwritten Korean, used sparingly for AI
+     comments / cute callouts / stickers. */
+  --font-accent: "Gaegu", "Noto Sans KR", cursive;
+}
