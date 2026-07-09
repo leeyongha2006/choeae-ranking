@@ -1,6 +1,5 @@
 (function () {
 const { Button } = window.DesignSystem_8db18d;
-const { useState } = React;
 
 function KakaoLogo({ size = 28 }) {
   return (
@@ -30,37 +29,18 @@ function InstaLogo({ size = 28 }) {
   );
 }
 
-const PLATFORMS = [
-  {
-    key: "kakao",
-    logo: () => <KakaoLogo />,
-    label: "카카오톡",
-    desc: "누구랑 얼마나 많이 대화했는지로 친한 순서를 뽑아요",
-    sub: "채팅방에서 파일 꺼내면 바로 OK",
-  },
-  {
-    key: "insta",
-    logo: () => <InstaLogo />,
-    label: "인스타그램",
-    desc: "DM, 게시물 좋아요, 댓글로 제일 자주 소통한 친구를 찾아요",
-    sub: "인스타 설정에서 파일 받는 데 1~3일 걸려요",
-  },
-];
-
 function OnboardingScreen({ onNavigate, appData, setAppData }) {
   const { AppShell } = window;
   const isMobile = window.useIsMobile ? window.useIsMobile() : false;
-  const [selected, setSelected] = useState("kakao");
 
   function handleStart() {
-    setAppData(prev => ({ ...prev, platformChoice: selected }));
     onNavigate("upload");
   }
 
   return (
     <AppShell activeNav="onboarding" activeHeader="intro" onNavigate={onNavigate}>
       {/* 히어로 */}
-      <div style={{ textAlign: "center", padding: isMobile ? "8px 0 4px" : "16px 0 8px" }}>
+      <div className="anim-slide-up" style={{ textAlign: "center", padding: isMobile ? "8px 0 4px" : "16px 0 8px" }}>
         <div style={{
           display: "inline-block", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
           color: "var(--violet-600)", background: "var(--violet-100)",
@@ -76,56 +56,63 @@ function OnboardingScreen({ onNavigate, appData, setAppData }) {
             진짜로 누구인지
           </span>{" "}알아봐요 👑
         </h1>
-
-        <p style={{ fontSize: isMobile ? 13 : 14, color: "var(--text-secondary)", margin: 0, lineHeight: 1.6 }}>
-          카카오톡·인스타 파일을 올리면 AI가 대화량, 응답속도, 반응도를<br />
-          분석해서 친밀도 순위를 뽑아줘요
-        </p>
       </div>
 
-      {/* 플랫폼 선택 */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-secondary)" }}>어떤 데이터로 분석할까요?</div>
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-          {PLATFORMS.map(p => {
-            const Logo = p.logo;
-            return (
-              <div
-                key={p.key}
-                onClick={() => setSelected(p.key)}
-                style={{
-                  flex: "1 1 160px", padding: "16px", borderRadius: "var(--radius-lg)", cursor: "pointer",
-                  border: selected === p.key ? "2px solid var(--violet-600)" : "1.5px solid var(--border-soft)",
-                  background: selected === p.key ? "var(--violet-100)" : "var(--surface-card)",
-                  boxShadow: selected === p.key ? "0 0 0 3px rgba(124,58,237,0.12)" : "none",
-                  transition: "all 160ms var(--ease-out)",
-                  display: "flex", flexDirection: "column", gap: 6, position: "relative",
-                }}
-              >
-                {selected === p.key && (
-                  <div style={{
-                    position: "absolute", top: 10, right: 10,
-                    width: 18, height: 18, borderRadius: "50%",
-                    background: "var(--violet-600)", display: "flex", alignItems: "center",
-                    justifyContent: "center", fontSize: 10, color: "#fff", fontWeight: 800,
-                  }}>✓</div>
-                )}
-                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                  <Logo />
-                  <span style={{ fontWeight: 800, fontSize: 14, color: "var(--text-primary)" }}>{p.label}</span>
-                </div>
-                <div style={{ fontSize: 12, color: "var(--text-secondary)", lineHeight: 1.5, marginTop: 4 }}>{p.desc}</div>
-                <div style={{ fontSize: 11, color: "var(--text-tertiary)", marginTop: 4 }}>{p.sub}</div>
-              </div>
-            );
-          })}
+      {/* 인스타 히어로 카드 */}
+      <div className="anim-slide-up-2" style={{
+        borderRadius: 24,
+        background: "linear-gradient(135deg, #f09433 0%, #e1306c 50%, #bc1888 100%)",
+        padding: "28px 24px",
+        color: "#fff",
+        boxShadow: "0 8px 32px rgba(220,39,67,0.28)",
+      }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
+          <div style={{
+            width: 52, height: 52, borderRadius: 14,
+            background: "rgba(255,255,255,0.2)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            backdropFilter: "blur(4px)",
+          }}>
+            <InstaLogo size={32} />
+          </div>
+          <div>
+            <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 800, letterSpacing: "-0.02em" }}>
+              인스타그램
+            </div>
+            <div style={{ fontSize: 12, opacity: 0.85, marginTop: 1 }}>메인 분석 소스</div>
+          </div>
+        </div>
+        <div style={{ fontSize: 14, lineHeight: 1.7, opacity: 0.95 }}>
+          DM · 게시물 좋아요 · 댓글 — 모든 소통 데이터로<br />
+          <strong>제일 자주 연락한 친구</strong>를 정확하게 찾아요
+        </div>
+        <div style={{
+          marginTop: 14, padding: "8px 12px",
+          background: "rgba(255,255,255,0.15)", borderRadius: 10,
+          fontSize: 12, opacity: 0.9,
+        }}>
+          💡 인스타 설정에서 파일 신청 후 1~3일 후 도착해요
+        </div>
+      </div>
+
+      {/* 카카오 작은 보조 */}
+      <div className="anim-slide-up-3" style={{
+        display: "flex", alignItems: "center", gap: 10,
+        padding: "12px 16px",
+        background: "var(--surface-card)", borderRadius: 14,
+        border: "1px solid var(--border-soft)",
+      }}>
+        <KakaoLogo size={22} />
+        <div style={{ flex: 1 }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>카카오톡도 같이 올리면 더 정확해져요</span>
+          <div style={{ fontSize: 11, color: "var(--text-tertiary)", marginTop: 1 }}>파일 올리기 단계에서 선택할 수 있어요</div>
         </div>
       </div>
 
       {/* CTA */}
-      <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
+      <div className="anim-slide-up-4" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
         <Button variant="primary" size="lg" onClick={handleStart} style={{ width: isMobile ? "100%" : "auto" }}>
-          {selected === "kakao" ? "카카오톡으로 시작" : "인스타그램으로 시작"} →
+          시작하기 →
         </Button>
         <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>
           파일은 내 브라우저에서만 처리돼요 — 어디에도 저장되지 않아요

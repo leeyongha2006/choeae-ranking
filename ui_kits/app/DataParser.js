@@ -44,7 +44,7 @@
   }
 
   // ── Instagram JSON parser ──────────────────────────────────────────
-  // Handles messages (inbox/*.json), liked posts, and liked comments
+  // Handles DM message files from messages/inbox/<friend>/message_1.json
   function parseInstagram(data) {
     const counts = {};
 
@@ -53,24 +53,9 @@
       counts[name] = (counts[name] || 0) + pts;
     }
 
-    // DM messages: { participants, messages: [{sender_name, ...}] }
+    // DM messages: { participants: [{name}], messages: [{sender_name, ...}] }
     if (data.messages && Array.isArray(data.messages)) {
       for (const msg of data.messages) add(msg.sender_name, 1);
-    }
-
-    // Liked posts: { likes_media_likes: [{title, ...}] }
-    if (data.likes_media_likes) {
-      for (const like of data.likes_media_likes) add(like.title, 2);
-    }
-
-    // Liked comments: { likes_comment_likes: [{title, ...}] }
-    if (data.likes_comment_likes) {
-      for (const like of data.likes_comment_likes) add(like.title, 1);
-    }
-
-    // Comments: { comments_media_comments: [{title, ...}] }
-    if (data.comments_media_comments) {
-      for (const c of data.comments_media_comments) add(c.title, 1);
     }
 
     return counts;

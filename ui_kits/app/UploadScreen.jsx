@@ -73,7 +73,7 @@ const INSTA_STEPS = [
   {
     num: 6,
     title: "설정 변경 후 내보내기 시작",
-    desc: "기간을 '전체'로 바꾸고, 형식을 'JSON'으로 꼭 바꾼 뒤 '내보내기 시작'을 탭해요. 정보 맞춤 설정은 '사용 가능한 모든 정보'로 두세요.",
+    desc: "정보 맞춤 설정을 탭해서 '메시지'만 체크해요. 기간을 '전체'로, 형식을 'JSON'으로 바꾼 뒤 '내보내기 시작'을 탭해요.",
     tip: "형식이 처음엔 HTML이에요. 반드시 JSON으로 바꿔야 앱에서 읽을 수 있어요!",
     img: "./guide_imgs/insta_step6_config.png",
   },
@@ -290,49 +290,78 @@ function StepGuide({ steps, accentColor, accentBg, files, file, onAddFiles, onRe
   );
 }
 
-function PlatformSection({ platform, files, file, onAddFiles, onRemoveFile, onSelectFile, error }) {
-  const isKakao = platform === "kakao";
-  const steps = isKakao ? KAKAO_STEPS : INSTA_STEPS;
-  const accentColor = isKakao ? "#f59e0b" : "#e1306c";
-  const accentBg = isKakao ? "#fef3c7" : "#fce7f0";
-  const LogoIcon = isKakao ? KakaoLogo : InstaLogo;
-
+function InstaSection({ file, onSelectFile, error }) {
   return (
-    <div style={{
-      background: "var(--surface-card)", border: "1px solid var(--border-soft)",
-      borderRadius: "var(--radius-xl)", overflow: "hidden",
+    <div className="anim-slide-up" style={{
+      borderRadius: 20, overflow: "hidden",
+      boxShadow: "0 4px 20px rgba(220,39,67,0.15)",
     }}>
       <div style={{
-        padding: "12px 16px", background: accentBg,
-        display: "flex", alignItems: "center", gap: 10,
-        borderBottom: "1px solid var(--border-soft)",
+        padding: "16px 18px",
+        background: "linear-gradient(135deg, #f09433 0%, #e1306c 55%, #bc1888 100%)",
+        display: "flex", alignItems: "center", gap: 12,
       }}>
-        <LogoIcon size={22} />
+        <div style={{
+          width: 42, height: 42, borderRadius: 11,
+          background: "rgba(255,255,255,0.2)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+        }}>
+          <InstaLogo size={26} />
+        </div>
         <div>
-          <div style={{ fontWeight: 800, fontSize: 14, color: "var(--text-primary)" }}>
-            {isKakao ? "카카오톡" : "인스타그램"} 파일 올리기
-          </div>
-          <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-            {isKakao
-              ? `총 ${KAKAO_STEPS.length}단계 · 친구마다 채팅방 파일 하나씩`
-              : `총 ${INSTA_STEPS.length}단계 · 인스타 설정에서 대화 파일 받기`}
+          <div style={{ fontWeight: 800, fontSize: 16, color: "#fff" }}>인스타그램 파일 올리기</div>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,0.8)", marginTop: 1 }}>
+            총 {INSTA_STEPS.length}단계 · 인스타 설정에서 대화 파일 받기
           </div>
         </div>
       </div>
+      <div style={{ background: "var(--surface-card)", border: "1.5px solid #e1306c", borderTop: "none", borderRadius: "0 0 20px 20px" }}>
+        <StepGuide
+          steps={INSTA_STEPS} accentColor="#e1306c" accentBg="#fce7f0"
+          file={file} onSelectFile={onSelectFile}
+        />
+        {error && <div style={{ padding: "0 16px 12px", fontSize: 12, color: "var(--color-danger)" }}>⚠️ {error}</div>}
+      </div>
+    </div>
+  );
+}
 
-      <StepGuide
-        steps={steps}
-        accentColor={accentColor}
-        accentBg={accentBg}
-        files={files}
-        file={file}
-        onAddFiles={onAddFiles}
-        onRemoveFile={onRemoveFile}
-        onSelectFile={onSelectFile}
-      />
+function KakaoBonus({ files, onAddFiles, onRemoveFile, error }) {
+  const [open, setOpen] = useState(false);
 
-      {error && (
-        <div style={{ padding: "0 16px 12px", fontSize: 12, color: "var(--color-danger)" }}>⚠️ {error}</div>
+  return (
+    <div className="anim-slide-up-2" style={{
+      borderRadius: 14, overflow: "hidden",
+      border: "1px solid var(--border-soft)",
+      background: "var(--surface-card)",
+    }}>
+      <button
+        onClick={() => setOpen(o => !o)}
+        style={{
+          width: "100%", display: "flex", alignItems: "center", gap: 10,
+          padding: "11px 14px", background: "none",
+          border: "none", cursor: "pointer", fontFamily: "var(--font-body)", textAlign: "left",
+        }}
+      >
+        <KakaoLogo size={18} />
+        <div style={{ flex: 1 }}>
+          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>
+            카카오톡 파일 추가하기
+            {files.length > 0 && <span style={{ marginLeft: 6, fontSize: 12, color: "#92400e" }}>({files.length}명)</span>}
+          </span>
+          <div style={{ fontSize: 11, color: "var(--text-tertiary)", marginTop: 1 }}>선택사항 · 올리면 결과가 더 정확해져요</div>
+        </div>
+        <span style={{ fontSize: 11, color: "var(--text-tertiary)", transition: "transform 0.2s", display: "inline-block", transform: open ? "rotate(180deg)" : "none" }}>▼</span>
+      </button>
+
+      {open && (
+        <div className="anim-fade" style={{ borderTop: "1px solid var(--border-soft)" }}>
+          <StepGuide
+            steps={KAKAO_STEPS} accentColor="#f59e0b" accentBg="#fef3c7"
+            files={files} onAddFiles={onAddFiles} onRemoveFile={onRemoveFile}
+          />
+          {error && <div style={{ padding: "0 16px 12px", fontSize: 12, color: "var(--color-danger)" }}>⚠️ {error}</div>}
+        </div>
       )}
     </div>
   );
@@ -341,10 +370,6 @@ function PlatformSection({ platform, files, file, onAddFiles, onRemoveFile, onSe
 function UploadScreen({ onNavigate, appData, setAppData }) {
   const { AppShell } = window;
   const isMobile = useIsMobile();
-
-  const choice = appData?.platformChoice || "kakao";
-  const showKakao = choice === "kakao";
-  const showInsta = choice === "insta";
 
   const [kakaoFiles, setKakaoFiles] = useState([]);
   const [instaFile, setInstaFile] = useState(null);
@@ -383,12 +408,7 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
     onNavigate("analyzing");
   }
 
-  function handleDemo() {
-    setAppData(prev => ({ ...prev, kakaoFiles: [], instaFile: null, isDemo: true }));
-    onNavigate("analyzing");
-  }
-
-  const canStart = (showKakao && kakaoFiles.length > 0) || (showInsta && instaFile);
+  const canStart = instaFile !== null;
 
   return (
     <AppShell activeNav="upload" onNavigate={onNavigate}>
@@ -398,51 +418,34 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
             파일 올리기
           </h2>
           <p style={{ fontSize: 13, color: "var(--text-secondary)", margin: "4px 0 0" }}>
-            {showKakao ? "친구마다 채팅방 파일을 하나씩 꺼내서 한 번에 올려요" : "인스타 설정에서 대화 파일 받는 법을 안내해드려요"}
+            인스타그램 파일을 올려주세요
           </p>
         </div>
-        <Button variant="default" size="sm" onClick={() => onNavigate("onboarding")}>← 다시 선택</Button>
+        <Button variant="default" size="sm" onClick={() => onNavigate("onboarding")}>← 뒤로</Button>
       </div>
 
-      {showKakao && (
-        <PlatformSection
-          platform="kakao"
+      <InstaSection
+        file={instaFile}
+        onSelectFile={handleInsta}
+        error={instaError}
+      />
+
+      {instaFile && (
+        <KakaoBonus
           files={kakaoFiles}
           onAddFiles={handleAddKakao}
           onRemoveFile={handleRemoveKakao}
           error={kakaoError}
         />
       )}
-      {showInsta && (
-        <PlatformSection
-          platform="insta"
-          file={instaFile}
-          onSelectFile={handleInsta}
-          error={instaError}
-        />
-      )}
 
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
-        <button
-          onClick={handleDemo}
-          style={{
-            fontSize: 13, color: "var(--text-tertiary)", background: "none",
-            border: "none", cursor: "pointer", textDecoration: "underline",
-            fontFamily: "var(--font-body)",
-          }}
-        >
-          데모로 먼저 볼게요
-        </button>
-        <Button
-          variant="primary" size="lg"
-          onClick={canStart ? handleStart : undefined}
-          style={{ opacity: canStart ? 1 : 0.4 }}
-        >
-          {canStart
-            ? showKakao ? `${kakaoFiles.length}명 분석 시작 →` : "분석 시작 →"
-            : "파일을 먼저 선택해주세요"}
-        </Button>
-      </div>
+      {canStart && (
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <Button variant="primary" size="lg" onClick={handleStart} style={{ width: "100%" }}>
+            {kakaoFiles.length > 0 ? `분석 시작 (인스타 + 카톡 ${kakaoFiles.length}명) →` : "분석 시작 →"}
+          </Button>
+        </div>
+      )}
     </AppShell>
   );
 }

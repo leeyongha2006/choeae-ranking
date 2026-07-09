@@ -43,7 +43,7 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
 
   async function runAnalysis() {
     try {
-      const { parseKakaoFile, parseInstagram, computeRankings, getDemoData } = window.DataParser;
+      const { parseKakaoFile, parseInstagram, computeRankings } = window.DataParser;
 
       advance(0, 15);
       await delay(400);
@@ -51,28 +51,19 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
       let kakaoData = null;
       let instaData = null;
 
-      if (appData.isDemo) {
-        advance(1, 40);
-        await delay(600);
-        const demo = getDemoData();
-        kakaoData = demo.kakao;
-        instaData = demo.insta;
-      } else {
-        // KakaoTalk: multiple files, one per friend's chat room
-        if (appData.kakaoFiles && appData.kakaoFiles.length > 0) {
-          advance(1, 30);
-          kakaoData = {};
-          for (const file of appData.kakaoFiles) {
-            const text = await readFileAsText(file);
-            const { friendName, count } = parseKakaoFile(file.name, text);
-            kakaoData[friendName] = (kakaoData[friendName] || 0) + count;
-          }
+      if (appData.kakaoFiles && appData.kakaoFiles.length > 0) {
+        advance(1, 30);
+        kakaoData = {};
+        for (const file of appData.kakaoFiles) {
+          const text = await readFileAsText(file);
+          const { friendName, count } = parseKakaoFile(file.name, text);
+          kakaoData[friendName] = (kakaoData[friendName] || 0) + count;
         }
-        if (appData.instaFile) {
-          advance(1, 55);
-          const json = await readFileAsJSON(appData.instaFile);
-          instaData = parseInstagram(json);
-        }
+      }
+      if (appData.instaFile) {
+        advance(1, 55);
+        const json = await readFileAsJSON(appData.instaFile);
+        instaData = parseInstagram(json);
       }
 
       advance(2, 75);
@@ -114,14 +105,8 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
   return (
     <AppShell activeNav="upload" onNavigate={onNavigate}>
       <span style={{ fontFamily: "var(--font-display)", fontSize: 28, color: "var(--ink-900)" }}>
-        {appData.isDemo ? "데모 데이터 분석 중" : "파일 분석 중입니다"}
+        파일 분석 중입니다
       </span>
-
-      {appData.isDemo && (
-        <div style={{ background: "var(--violet-100)", borderRadius: "var(--radius-md)", padding: "10px 16px", fontSize: 13, color: "var(--violet-700)" }}>
-          💡 데모 모드 — 샘플 데이터로 실제 서비스 경험을 미리 확인해보세요
-        </div>
-      )}
 
       <Well>
         <span style={{ fontWeight: 700, fontSize: 15, color: "var(--text-primary)" }}>
