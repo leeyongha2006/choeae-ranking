@@ -1,0 +1,25 @@
+<!-- @dsCard group="Components" viewport="700x140" name="Image" subtitle="Round / square avatar placeholder" -->
+<!DOCTYPE html>
+<html><head><link rel="stylesheet" href="../../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js"></script>
+<script src="../../../_ds_bundle.js"></script>
+<style>body{margin:0;background:var(--surface-canvas);font-family:var(--font-body)}</style>
+</head><body>
+<div id="root"></div>
+<script type="text/babel">
+const { Image } = window.DesignSystem_8db18d;
+function App(){
+  return (
+    <div style={{padding:20,display:"flex",gap:16,alignItems:"center"}}>
+      <Image shape="round" size={64} initials="민지" />
+      <Image shape="round" size={48} initials="준호" />
+      <Image shape="square" size={64} initials="AI" />
+      <Image shape="square" size={80} initials="차트" />
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body></html>
