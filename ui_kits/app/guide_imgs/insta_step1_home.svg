@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 160" width="300" height="160">
+  <!-- Background -->
+  <rect width="300" height="160" fill="#000"/>
+
+  <!-- Bottom nav background -->
+  <rect x="0" y="108" width="300" height="52" fill="#0a0a0a" stroke="#262626" stroke-width="0.5"/>
+
+  <!-- Content area preview (faded) -->
+  <rect x="0" y="0" width="300" height="108" fill="#111"/>
+  <text x="12" y="22" fill="#fff" font-family="-apple-system,sans-serif" font-size="14" font-weight="700">Instagram</text>
+  <text x="0" y="0" fill="none"/>
+  <!-- Story circles -->
+  <circle cx="36" cy="62" r="26" fill="none" stroke="#833AB4" stroke-width="2.5"/>
+  <circle cx="36" cy="62" r="22" fill="#222"/>
+  <circle cx="96" cy="62" r="26" fill="none" stroke="#E1306C" stroke-width="2.5"/>
+  <circle cx="96" cy="62" r="22" fill="#222"/>
+  <circle cx="156" cy="62" r="26" fill="none" stroke="#F77737" stroke-width="2.5"/>
+  <circle cx="156" cy="62" r="22" fill="#222"/>
+
+  <!-- Bottom nav icons -->
+  <!-- Home icon -->
+  <path d="M20 134 L30 126 L40 134 L40 144 L24 144 L24 138 L36 138 L36 144" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"/>
+  <!-- Search icon -->
+  <circle cx="80" cy="134" r="7" fill="none" stroke="#8e8e8e" stroke-width="1.8"/>
+  <line x1="85" y1="139" x2="89" y2="143" stroke="#8e8e8e" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Reels icon -->
+  <rect x="133" y="127" width="14" height="14" rx="3" fill="none" stroke="#8e8e8e" stroke-width="1.8"/>
+  <polygon points="137,131 137,141 144,136" fill="#8e8e8e"/>
+  <!-- Plus icon -->
+  <rect x="193" y="127" width="14" height="14" rx="2" fill="none" stroke="#8e8e8e" stroke-width="1.8"/>
+  <line x1="196" y1="134" x2="204" y2="134" stroke="#8e8e8e" stroke-width="1.8" stroke-linecap="round"/>
+  <line x1="200" y1="130" x2="200" y2="138" stroke="#8e8e8e" stroke-width="1.8" stroke-linecap="round"/>
+  <!-- Profile icon - highlighted -->
+  <circle cx="258" cy="134" r="14" fill="none" stroke="#E1306C" stroke-width="2.5"/>
+  <circle cx="258" cy="134" r="11" fill="#333"/>
+  <circle cx="258" cy="131" r="4" fill="#888"/>
+  <path d="M250 144 Q258 138 266 144" fill="#888" stroke="none"/>
+
+  <!-- Highlight indicator -->
+  <circle cx="258" cy="134" r="17" fill="none" stroke="#E1306C" stroke-width="2" opacity="0.5" stroke-dasharray="4,3"/>
+
+  <!-- Arrow pointing to profile -->
+  <line x1="258" y1="103" x2="258" y2="114" stroke="#E1306C" stroke-width="2" stroke-linecap="round"/>
+  <polygon points="254,110 258,116 262,110" fill="#E1306C"/>
+
+  <!-- Label -->
+  <rect x="196" y="84" width="124" height="20" rx="10" fill="#E1306C" opacity="0.9"/>
+  <text x="258" y="98" fill="#fff" font-family="-apple-system,sans-serif" font-size="10" font-weight="700" text-anchor="middle">내 프로필 아이콘 탭</text>
+</svg>

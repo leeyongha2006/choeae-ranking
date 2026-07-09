@@ -8,18 +8,21 @@ const KAKAO_STEPS = [
     title: "비교할 친구 정하기",
     desc: "랭킹에 올릴 친구들을 정해요. 각 친구마다 채팅방에서 파일을 하나씩 꺼내야 해요.",
     tip: "친구가 많을수록 랭킹이 정확해요. 5명 이상 추천!",
+    img: "./guide_imgs/kakao_step1_friends.svg",
   },
   {
     num: 2,
     title: "채팅방 열고 ☰ 탭하기",
     desc: "친구와의 채팅방을 열고 오른쪽 위 ☰ 버튼 → 아래로 내려서 '채팅방 설정'을 탭해요.",
     tip: "안드로이드는 화면 아래 메뉴에 ☰가 있을 수 있어요.",
+    img: "./guide_imgs/kakao_step2_menu.svg",
   },
   {
     num: 3,
     title: "'대화 내보내기' 탭하기",
     desc: "'대화 내보내기' → '내 파일에 저장'을 탭해요. 비교할 친구 수만큼 반복해요.",
     tip: "사진·동영상 포함 여부는 아무거나 선택해도 돼요.",
+    img: "./guide_imgs/kakao_step3_export.svg",
   },
   {
     num: 4,
@@ -37,30 +40,35 @@ const INSTA_STEPS = [
     title: "프로필 화면 열기",
     desc: "인스타그램 하단 오른쪽 내 프로필 아이콘을 탭해요.",
     tip: null,
+    img: "./guide_imgs/insta_step1_home.svg",
   },
   {
     num: 2,
     title: "설정 들어가기",
     desc: "프로필 화면 오른쪽 위 ☰ 탭 → '설정' 탭 → 화면 아래로 내려서 '계정 센터'를 탭해요.",
     tip: null,
+    img: "./guide_imgs/insta_step2_settings.svg",
   },
   {
     num: 3,
     title: "내 정보 다운로드 열기",
     desc: "'내 정보 및 권한' → '내 정보 다운로드' → '정보 다운로드 또는 전송'을 탭해요.",
     tip: null,
+    img: "./guide_imgs/insta_step3_info.svg",
   },
   {
     num: 4,
     title: "'파일 만들기' 탭하기",
     desc: "계정 선택 → '사용 가능한 모든 정보' → '기기에 다운로드' → 형식을 'JSON'으로 꼭 바꾼 뒤 '파일 만들기'를 탭해요.",
     tip: "형식이 처음엔 HTML로 되어 있어요. 반드시 JSON으로 바꿔주세요!",
+    img: "./guide_imgs/insta_step4_download.svg",
   },
   {
     num: 5,
     title: "이메일로 받기",
     desc: "파일 준비가 되면 Instagram에서 이메일로 알려줘요. 이메일의 다운로드 링크를 탭하면 파일이 저장돼요.",
     tip: "스팸 메일함도 확인해보세요. 계정 크기에 따라 수 분~수 시간 걸릴 수 있어요.",
+    img: "./guide_imgs/insta_step5_email.svg",
   },
   {
     num: 6,
@@ -68,6 +76,7 @@ const INSTA_STEPS = [
     desc: "받은 압축 파일을 풀면 폴더가 생겨요. messages → inbox → 친구 이름 폴더 안에 있는 파일을 아래 버튼으로 올려요.",
     tip: "친구마다 폴더가 따로 있어요. 'message_1'로 시작하는 파일이에요.",
     isUploadStep: true,
+    img: "./guide_imgs/insta_step6_file.svg",
   },
 ];
 
@@ -223,6 +232,15 @@ function StepGuide({ steps, accentColor, accentBg, files, file, onAddFiles, onRe
             fontSize: 12, color: "var(--text-primary)", lineHeight: 1.5,
           }}>
             💡 {step.tip}
+          </div>
+        )}
+        {step.img && (
+          <div style={{ marginTop: 14, borderRadius: "var(--radius-md)", overflow: "hidden", border: "1px solid var(--border-soft)" }}>
+            <img
+              src={step.img}
+              alt={step.title}
+              style={{ width: "100%", display: "block", maxHeight: 200, objectFit: "contain", background: "#111" }}
+            />
           </div>
         )}
       </div>
