@@ -50,6 +50,7 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
 
       let kakaoData = null;
       let instaData = null;
+      let myName = null;
 
       if (appData.kakaoFiles && appData.kakaoFiles.length > 0) {
         advance(1, 30);
@@ -63,19 +64,21 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
       if (appData.instaFile) {
         advance(1, 55);
         const json = await readFileAsJSON(appData.instaFile);
-        instaData = parseInstagram(json);
+        const result = parseInstagram(json);
+        instaData = result.counts;
+        if (!myName && result.myName) myName = result.myName;
       }
 
       advance(2, 75);
       await delay(500);
 
-      const rankings = computeRankings(kakaoData, instaData, null);
+      const rankings = computeRankings(kakaoData, instaData, myName);
 
       const totalMessages = Object.values(kakaoData || {}).reduce((a, b) => a + b, 0)
-        + Object.values(instaData || {}).reduce((a, b) => a + b, 0);
+        + Object.entries(instaData || {}).filter(([n]) => n !== myName).reduce((a, [, b]) => a + b, 0);
       const totalContacts = new Set([
         ...Object.keys(kakaoData || {}),
-        ...Object.keys(instaData || {}),
+        ...Object.keys(instaData || {}).filter(n => n !== myName),
       ]).size;
 
       advance(3, 100);

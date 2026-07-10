@@ -72,7 +72,7 @@ function DashboardScreen({ onNavigate, appData }) {
               <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
                 <span style={{ fontWeight: 700, fontSize: 14, color: "var(--text-primary)" }}>{f.name}</span>
                 <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-                  대화 횟수 {(f.kakaoCount || f.score || 0).toLocaleString()}회
+                  대화 횟수 {((f.kakaoCount || 0) + (f.instaCount || 0)).toLocaleString()}회
                   {f.avgResponseMin ? ` · 평균 응답 ${f.avgResponseMin}분` : ""}
                 </span>
               </div>

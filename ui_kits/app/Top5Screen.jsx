@@ -26,7 +26,7 @@ function Top5Screen({ onNavigate, appData }) {
   const rank = hasData ? appData.rankings : DEMO_RANK;
   const isDemo = appData && appData.isDemo;
 
-  const totalMsgs = rank.reduce((s, f) => s + (f.kakaoCount || 0), 0);
+  const totalMsgs = rank.reduce((s, f) => s + (f.kakaoCount || 0) + (f.instaCount || 0), 0);
   const topFriend = rank[0];
   const maxScore = Math.max(...rank.map((f) => f.score || f.kakaoCount || 1));
 
@@ -82,7 +82,7 @@ function Top5Screen({ onNavigate, appData }) {
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <ScoreBar value={f.score || f.kakaoCount} max={maxScore} />
                     <span style={{ fontSize: 11, color: "var(--text-secondary)", whiteSpace: "nowrap" }}>
-                      {(f.kakaoCount || 0).toLocaleString()}회
+                      {((f.kakaoCount || 0) + (f.instaCount || 0)).toLocaleString()}회
                     </span>
                   </div>
                 </div>

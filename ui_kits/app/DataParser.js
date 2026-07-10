@@ -45,20 +45,21 @@
 
   // ── Instagram JSON parser ──────────────────────────────────────────
   // Handles DM message files from messages/inbox/<friend>/message_1.json
+  // Returns { counts, myName } where myName is inferred from participants[0].
+  // Instagram DM exports consistently list the account owner first in participants.
   function parseInstagram(data) {
     const counts = {};
 
-    function add(name, pts) {
-      if (!name) return;
-      counts[name] = (counts[name] || 0) + pts;
-    }
-
-    // DM messages: { participants: [{name}], messages: [{sender_name, ...}] }
     if (data.messages && Array.isArray(data.messages)) {
-      for (const msg of data.messages) add(msg.sender_name, 1);
+      for (const msg of data.messages) {
+        if (!msg.sender_name) continue;
+        counts[msg.sender_name] = (counts[msg.sender_name] || 0) + 1;
+      }
     }
 
-    return counts;
+    const myName = data.participants?.[0]?.name || null;
+
+    return { counts, myName };
   }
 
   // ── Merge + rank ───────────────────────────────────────────────────
