@@ -42,10 +42,9 @@ const INSTA_STEPS = [
   {
     num: 7,
     title: "zip 파일 그대로 올리기",
-    desc: "파일이 준비되면 알림이 와요. 다운로드된 .zip 파일을 풀지 말고 그대로 아래에 올려주세요.",
-    tip: "압축을 직접 풀 필요 없어요. zip 파일 그대로 올리면 돼요!",
+    desc: "파일 준비에 최대 몇 시간이 걸릴 수 있어요. 알림이 오면 다운로드 후 아래 버튼으로 올려주세요.",
+    tip: "파일 이름: instagram-YYYYMMDD.zip 형태예요. 압축 풀 필요 없이 zip 그대로 올리면 돼요.",
     isUploadStep: true,
-    img: "./guide_imgs/insta_step6_file.svg",
   },
 ];
 
