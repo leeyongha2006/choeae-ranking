@@ -140,7 +140,7 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
         )}
 
         {step.img && (
-          <div style={{ borderRadius: 16, overflow: "hidden", border: "1px solid #1e1e1e", background: "#111" }}>
+          <div style={{ borderRadius: 16, overflow: "hidden", border: "1.5px solid rgba(255,255,255,0.15)", background: "#111" }}>
             <img
               src={step.img}
               alt={step.title}
