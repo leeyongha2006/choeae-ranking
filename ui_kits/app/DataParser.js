@@ -1,113 +1,78 @@
 (function () {
-  // ── KakaoTalk .txt parser ──────────────────────────────────────────
-  // Handles both common export formats:
-  // Format A (most common): [이름] [오전/오후 HH:MM] message
-  // Format B (iOS):         YYYY년 MM월 DD일 오전/오후 HH:MM, 이름 : message
-  function parseKakaoTalk(text) {
-    const lines = text.split(/\r?\n/);
-    const counts = {};
-
-    const fmtA = /^\[(.+?)\]\s*\[(?:오전|오후)\s*\d+:\d+\]/;
-    const fmtB = /^\d{4}년\s*\d+월\s*\d+일\s*(?:오전|오후)\s*\d+:\d+,\s*(.+?)\s*:/;
-
-    for (const line of lines) {
-      const t = line.trim();
-      if (!t) continue;
-      const mA = t.match(fmtA);
-      if (mA) { const n = mA[1].trim(); counts[n] = (counts[n] || 0) + 1; continue; }
-      const mB = t.match(fmtB);
-      if (mB) { const n = mB[1].trim(); counts[n] = (counts[n] || 0) + 1; }
-    }
-
-    return counts; // { "이름": msgCount, ... }
-  }
-
-  // ── KakaoTalk multi-file parser ────────────────────────────────────
-  // Each file = one friend's chat room. Extracts friend name from filename,
-  // counts total messages in file as the friendship score.
-  // Filename pattern: KakaoTalk_친구이름_YYYYMMDD_HHMM.txt
-  function parseKakaoFile(fileName, text) {
-    // Extract friend name from filename
-    const nameMatch = fileName.match(/^KakaoTalk_(.+?)_\d{8}/i);
-    const friendName = nameMatch ? nameMatch[1] : fileName.replace(/\.txt$/i, "");
-
-    // Count total message lines (both sides = total interaction volume)
-    const fmtA = /^\[.+?\]\s*\[(?:오전|오후)\s*\d+:\d+\]/;
-    const fmtB = /^\d{4}년\s*\d+월\s*\d+일\s*(?:오전|오후)\s*\d+:\d+,\s*.+?\s*:/;
-    let count = 0;
-    for (const line of text.split(/\r?\n/)) {
-      const t = line.trim();
-      if (fmtA.test(t) || fmtB.test(t)) count++;
-    }
-
-    return { friendName, count };
-  }
-
   // ── Instagram JSON parser ──────────────────────────────────────────
-  // Handles DM message files from messages/inbox/<friend>/message_1.json
-  // Returns { counts, myName } where myName is inferred from participants[0].
-  // Instagram DM exports consistently list the account owner first in participants.
-  function parseInstagram(data) {
-    const counts = {};
+  // Instagram encodes non-ASCII as UTF-8 bytes stored as Latin-1 chars.
+  function fixInstaEncoding(str) {
+    if (!str) return str;
+    try { return decodeURIComponent(escape(str)); } catch { return str; }
+  }
 
+  const INSTA_PLACEHOLDER = "Instagram 사용자";
+
+  // folderName: ZIP 내 폴더명 (예: "john_smith_123456789") — 삭제 계정 fallback용
+  function parseInstagram(data, folderName) {
+    // 그룹DM: 참여자 3명 이상 → 스킵
+    if (data.participants && data.participants.length > 2) return null;
+
+    const title = fixInstaEncoding(data.title || null);
+
+    // 폴더명 끝의 숫자 ID 제거: "john_smith_123456789" → "john_smith"
+    const folderBase = folderName ? folderName.replace(/_\d+$/, "") : null;
+    // "instagramsayongja" 폴더 = 삭제/비활성화 계정, 식별 불가
+    const folderDisplay = (folderBase && folderBase !== "instagramsayongja") ? folderBase : null;
+
+    // title이 placeholder이면 사용 안 함
+    const usableTitle = (title && title !== INSTA_PLACEHOLDER) ? title : null;
+    const fallback = usableTitle || folderDisplay;
+
+    // 이름을 전혀 특정할 수 없는 계정 → 스킵
+    if (!fallback) return null;
+
+    const counts = {};
     if (data.messages && Array.isArray(data.messages)) {
       for (const msg of data.messages) {
         if (!msg.sender_name) continue;
-        counts[msg.sender_name] = (counts[msg.sender_name] || 0) + 1;
+        let name = fixInstaEncoding(msg.sender_name);
+        if (name === INSTA_PLACEHOLDER) name = fallback;
+        counts[name] = (counts[name] || 0) + 1;
       }
     }
 
-    const myName = data.participants?.[0]?.name || null;
+    const rawMyName = data.participants?.[0]?.name || null;
+    const myName = fixInstaEncoding(rawMyName);
 
-    return { counts, myName };
+    return { counts, myName, title };
   }
 
-  // ── Merge + rank ───────────────────────────────────────────────────
-  const RANK_MEDALS = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣"];
+  // ── Rank ───────────────────────────────────────────────────────────
+  const RANK_MEDALS = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"];
 
-  function computeRankings(kakaoData, instaData, myName) {
-    const kakao = kakaoData || {};
+  function computeRankings(instaData, myName) {
     const insta = instaData || {};
 
-    // 내 이름 제외한 모든 친구 목록
-    const names = new Set([
-      ...Object.keys(kakao).filter(n => n !== myName),
-      ...Object.keys(insta).filter(n => n !== myName),
-    ]);
+    const names = Object.keys(insta).filter(n => n !== myName);
+    const max = Math.max(1, ...names.map(n => insta[n]));
 
-    // 각 플랫폼별 최댓값 (정규화 기준)
-    const kakaoMax = Math.max(1, ...Object.entries(kakao).filter(([n]) => n !== myName).map(([, v]) => v));
-    const instaMax = Math.max(1, ...Object.entries(insta).filter(([n]) => n !== myName).map(([, v]) => v));
-
-    const combined = {};
-    for (const name of names) {
-      const kakaoNorm = ((kakao[name] || 0) / kakaoMax) * 100;
-      const instaNorm = ((insta[name] || 0) / instaMax) * 100;
-      combined[name] = kakaoNorm + instaNorm * 2;
-    }
-
-    const sorted = Object.entries(combined)
-      .sort(([, a], [, b]) => b - a)
-      .map(([name, score], i) => ({
+    const sorted = names
+      .sort((a, b) => insta[b] - insta[a])
+      .map((name, i) => ({
         rank: i + 1,
         medal: RANK_MEDALS[i] || `${i + 1}`,
         name,
-        score: Math.round(score),
-        kakaoCount: kakao[name] || 0,
-        instaCount: insta[name] || 0,
-        avgResponseMin: Math.floor(Math.random() * 20 + 2),
+        score: Math.round((insta[name] / max) * 100),
+        instaCount: insta[name],
+        kakaoCount: 0,
+        avgResponseMin: null,
         delta: i === 0 ? "—" : i % 2 === 0 ? `▲ ${i}` : `▼ ${i - 1}`,
       }));
 
-    return sorted.slice(0, 5);
+    return sorted;
   }
 
   // ── Demo data fallback ─────────────────────────────────────────────
   function getDemoData() {
-    const kakao = { 김민지: 987, 이준호: 842, 박서연: 761, 최다인: 698, 정하늘: 512, 홍성진: 401, 류지원: 312 };
-    const insta = { 김민지: 42, 박서연: 31, 이준호: 18, 최다인: 8 };
-    return { kakao, insta };
+    const insta = { 김민지: 987, 이준호: 842, 박서연: 761, 최다인: 698, 정하늘: 512, 홍성진: 401, 류지원: 312 };
+    return { insta };
   }
 
-  window.DataParser = { parseKakaoTalk, parseKakaoFile, parseInstagram, computeRankings, getDemoData };
+  window.DataParser = { parseInstagram, computeRankings, getDemoData };
 })();

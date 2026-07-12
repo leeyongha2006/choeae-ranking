@@ -1,124 +1,116 @@
 (function () {
-const { Button } = window.DesignSystem_8db18d;
 
-function KakaoLogo({ size = 28 }) {
+function OnboardingScreen({ onNavigate }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 28 28" fill="none">
-      <rect width="28" height="28" rx="7" fill="#FEE500"/>
-      <path d="M14 5.5C8.75 5.5 4.5 8.96 4.5 13.22c0 2.66 1.59 5.01 4.01 6.47l-.88 3.26 3.9-2.1c.77.15 1.57.23 2.47.23 5.25 0 9.5-3.46 9.5-7.72S19.25 5.5 14 5.5z" fill="#3C1E1E"/>
-    </svg>
-  );
-}
-
-function InstaLogo({ size = 28 }) {
-  const id = "igG" + size;
-  return (
-    <svg width={size} height={size} viewBox="0 0 28 28" fill="none">
-      <defs>
-        <linearGradient id={id} x1="0" y1="1" x2="1" y2="0">
-          <stop offset="0%" stopColor="#f09433"/>
-          <stop offset="40%" stopColor="#dc2743"/>
-          <stop offset="100%" stopColor="#bc1888"/>
-        </linearGradient>
-      </defs>
-      <rect width="28" height="28" rx="7" fill={`url(#${id})`}/>
-      <rect x="5" y="5" width="18" height="18" rx="5.5" fill="none" stroke="white" strokeWidth="1.8"/>
-      <circle cx="14" cy="14" r="4.5" fill="none" stroke="white" strokeWidth="1.8"/>
-      <circle cx="19.5" cy="8.5" r="1.1" fill="white"/>
-    </svg>
-  );
-}
-
-function OnboardingScreen({ onNavigate, appData, setAppData }) {
-  const { AppShell } = window;
-  const isMobile = window.useIsMobile ? window.useIsMobile() : false;
-
-  function handleStart() {
-    onNavigate("upload");
-  }
-
-  return (
-    <AppShell activeNav="onboarding" activeHeader="intro" onNavigate={onNavigate}>
-      {/* 히어로 */}
-      <div className="anim-slide-up" style={{ textAlign: "center", padding: isMobile ? "8px 0 4px" : "16px 0 8px" }}>
-        <div style={{
-          display: "inline-block", fontSize: 11, fontWeight: 700, letterSpacing: "0.08em",
-          color: "var(--violet-600)", background: "var(--violet-100)",
-          borderRadius: "var(--radius-pill)", padding: "4px 12px", marginBottom: 14,
-        }}>내 대화 데이터 100% 로컬 분석 · 서버 전송 없음</div>
-
-        <h1 style={{
-          fontFamily: "var(--font-display)", fontSize: isMobile ? 26 : 34, lineHeight: 1.25,
-          color: "var(--ink-900)", margin: "0 0 12px",
-        }}>
-          나랑 제일 친한 친구가<br />
-          <span style={{ background: "var(--gradient-holo)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
-            진짜로 누구인지
-          </span>{" "}알아봐요 👑
-        </h1>
-      </div>
-
-      {/* 인스타 히어로 카드 */}
-      <div className="anim-slide-up-2" style={{
-        borderRadius: 24,
-        background: "linear-gradient(135deg, #f09433 0%, #e1306c 50%, #bc1888 100%)",
-        padding: "28px 24px",
-        color: "#fff",
-        boxShadow: "0 8px 32px rgba(220,39,67,0.28)",
+    <div style={{
+      minHeight: "100vh",
+      minHeight: "100dvh",
+      background: "linear-gradient(160deg, #fff5f7 0%, #fff8f0 50%, #fdf5ff 100%)",
+      display: "flex", flexDirection: "column",
+      alignItems: "center", justifyContent: "center",
+      padding: "48px 24px 56px",
+      boxSizing: "border-box",
+    }}>
+      <div style={{
+        width: "100%", maxWidth: 380,
+        display: "flex", flexDirection: "column",
+        alignItems: "center", gap: 28,
       }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 14 }}>
-          <div style={{
-            width: 52, height: 52, borderRadius: 14,
-            background: "rgba(255,255,255,0.2)",
-            display: "flex", alignItems: "center", justifyContent: "center",
-            backdropFilter: "blur(4px)",
+
+        {/* 이모지 */}
+        <div style={{ fontSize: 56, lineHeight: 1 }}>👑</div>
+
+        {/* 타이틀 */}
+        <div style={{ textAlign: "center" }}>
+          <h1 style={{
+            fontFamily: "var(--font-display)",
+            fontSize: "clamp(26px, 8vw, 34px)",
+            lineHeight: 1.25, fontWeight: 900,
+            color: "#111", margin: "0 0 12px",
+            letterSpacing: "-0.02em",
           }}>
-            <InstaLogo size={32} />
-          </div>
-          <div>
-            <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 800, letterSpacing: "-0.02em" }}>
-              인스타그램
-            </div>
-            <div style={{ fontSize: 12, opacity: 0.85, marginTop: 1 }}>메인 분석 소스</div>
-          </div>
+            나랑 제일 친한 친구<br />
+            <span style={{
+              background: "linear-gradient(135deg, #f09433 0%, #e1306c 50%, #bc1888 100%)",
+              WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent",
+            }}>
+              진짜로 누구일까?
+            </span>
+          </h1>
+          <p style={{
+            fontSize: 15, color: "#666",
+            margin: 0, lineHeight: 1.65,
+          }}>
+            인스타그램 DM 기록으로<br />
+            자주 연락한 친구 순위를 뽑아드려요
+          </p>
         </div>
-        <div style={{ fontSize: 14, lineHeight: 1.7, opacity: 0.95 }}>
-          DM · 게시물 좋아요 · 댓글 — 모든 소통 데이터로<br />
-          <strong>제일 자주 연락한 친구</strong>를 정확하게 찾아요
-        </div>
+
+        {/* 기능 카드 */}
         <div style={{
-          marginTop: 14, padding: "8px 12px",
-          background: "rgba(255,255,255,0.15)", borderRadius: 10,
-          fontSize: 12, opacity: 0.9,
+          width: "100%",
+          borderRadius: 22,
+          background: "linear-gradient(145deg, #f09433 0%, #e1306c 55%, #bc1888 100%)",
+          padding: "22px 20px",
+          color: "#fff",
+          boxShadow: "0 16px 48px rgba(220,39,67,0.22), 0 4px 12px rgba(220,39,67,0.12)",
         }}>
-          💡 인스타 설정에서 파일 신청 후 1~3일 후 도착해요
-        </div>
-      </div>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 18 }}>
+            <div style={{
+              width: 46, height: 46, borderRadius: 13,
+              background: "rgba(255,255,255,0.2)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+            }}>
+              <svg width="26" height="26" viewBox="0 0 28 28" fill="none">
+                <rect x="5" y="5" width="18" height="18" rx="5.5" fill="none" stroke="white" strokeWidth="1.8"/>
+                <circle cx="14" cy="14" r="4.5" fill="none" stroke="white" strokeWidth="1.8"/>
+                <circle cx="19.5" cy="8.5" r="1.1" fill="white"/>
+              </svg>
+            </div>
+            <div>
+              <div style={{ fontWeight: 800, fontSize: 17, letterSpacing: "-0.02em" }}>인스타그램 DM</div>
+              <div style={{ fontSize: 12, opacity: 0.8, marginTop: 1 }}>자동으로 분석해드려요</div>
+            </div>
+          </div>
 
-      {/* 카카오 작은 보조 */}
-      <div className="anim-slide-up-3" style={{
-        display: "flex", alignItems: "center", gap: 10,
-        padding: "12px 16px",
-        background: "var(--surface-card)", borderRadius: 14,
-        border: "1px solid var(--border-soft)",
-      }}>
-        <KakaoLogo size={22} />
-        <div style={{ flex: 1 }}>
-          <span style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)" }}>카카오톡도 같이 올리면 더 정확해져요</span>
-          <div style={{ fontSize: 11, color: "var(--text-tertiary)", marginTop: 1 }}>파일 올리기 단계에서 선택할 수 있어요</div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 11 }}>
+            {[
+              ["💬", "대화를 가장 많이 나눈 친구 순위"],
+              ["📅", "원하는 기간만 골라서 분석"],
+              ["🔒", "파일이 내 기기 밖으로 나가지 않아요"],
+            ].map(([emoji, text]) => (
+              <div key={text} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 14 }}>
+                <span style={{ fontSize: 18, width: 24, textAlign: "center" }}>{emoji}</span>
+                <span style={{ opacity: 0.92 }}>{text}</span>
+              </div>
+            ))}
+          </div>
         </div>
-      </div>
 
-      {/* CTA */}
-      <div className="anim-slide-up-4" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10 }}>
-        <Button variant="primary" size="lg" onClick={handleStart} style={{ width: isMobile ? "100%" : "auto" }}>
-          시작하기 →
-        </Button>
-        <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>
-          파일은 내 브라우저에서만 처리돼요 — 어디에도 저장되지 않아요
-        </span>
+        {/* CTA */}
+        <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 10 }}>
+          <button
+            onClick={() => onNavigate("upload")}
+            style={{
+              width: "100%", padding: "17px",
+              background: "linear-gradient(135deg, #f09433 0%, #e1306c 50%, #bc1888 100%)",
+              border: "none", borderRadius: 16,
+              fontFamily: "var(--font-body)", fontSize: 16, fontWeight: 800,
+              color: "#fff", cursor: "pointer",
+              boxShadow: "0 8px 28px rgba(220,39,67,0.32)",
+              WebkitTapHighlightColor: "transparent",
+              letterSpacing: "-0.01em",
+            }}
+          >
+            시작하기 →
+          </button>
+          <p style={{ margin: 0, fontSize: 12, color: "#aaa", textAlign: "center", lineHeight: 1.5 }}>
+            인스타 파일 신청 후 1~3일 후에 받을 수 있어요
+          </p>
+        </div>
+
       </div>
-    </AppShell>
+    </div>
   );
 }
 

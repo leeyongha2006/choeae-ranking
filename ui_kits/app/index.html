@@ -1,9 +1,11 @@
-<!-- @dsCard group="App" viewport="1280x800" name="최애친구랭킹 App" subtitle="Onboarding → upload → ranking → holo share card, click-through" -->
 <!DOCTYPE html>
 <html lang="ko">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#e1306c" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
 <title>최애친구랭킹 — UI Kit</title>
 <link rel="stylesheet" href="../../styles.css">
 <script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
@@ -46,6 +48,7 @@
 </head>
 <body>
 <div id="root"></div>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
 <script src="../../_ds_bundle.js"></script>
 <script src="DataParser.js"></script>
 <script type="text/babel" src="AppShell.jsx"></script>
@@ -56,7 +59,6 @@
 <script type="text/babel" src="DashboardScreen.jsx"></script>
 <script type="text/babel" src="Top5Screen.jsx"></script>
 <script type="text/babel" src="ShareCardScreen.jsx"></script>
-<script type="text/babel" src="MyPageScreen.jsx"></script>
 <script type="text/babel" src="App.jsx"></script>
 <script type="text/babel">
 ReactDOM.createRoot(document.getElementById("root")).render(<App />);

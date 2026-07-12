@@ -20,7 +20,7 @@ function DashboardScreen({ onNavigate, appData }) {
   const uploadedAt = (appData && appData.uploadedAt) || "2026.07";
 
   return (
-    <AppShell activeNav="result" onNavigate={onNavigate}>
+    <AppShell activeNav="top5" onNavigate={onNavigate}>
       {isDemo && (
         <div style={{ background: "var(--violet-100)", borderRadius: "var(--radius-md)", padding: "10px 16px", fontSize: 13, color: "var(--violet-700)" }}>
           📊 데모 모드 — 샘플 데이터 기준 결과입니다

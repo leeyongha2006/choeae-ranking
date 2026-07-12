@@ -3,11 +3,13 @@ const { Button, Image } = window.DesignSystem_8db18d;
 const { useState } = React;
 
 const DEMO_RANK = [
-  { rank: 1, medal: "🥇", name: "김민지", score: 98, kakaoCount: 987, instaCount: 42, avgResponseMin: 6, delta: "전월 대비 유지" },
-  { rank: 2, medal: "🥈", name: "이준호", score: 87, kakaoCount: 842, instaCount: 18, avgResponseMin: 11, delta: "전월 대비 ▲1" },
-  { rank: 3, medal: "🥉", name: "박서연", score: 79, kakaoCount: 761, instaCount: 31, avgResponseMin: 8, delta: "전월 대비 ▼2" },
-  { rank: 4, medal: "4️⃣", name: "최다인", score: 68, kakaoCount: 698, instaCount: 8, avgResponseMin: 15, delta: "전월 대비 0" },
-  { rank: 5, medal: "5️⃣", name: "정하늘", score: 55, kakaoCount: 512, instaCount: 0, avgResponseMin: 20, delta: "전월 대비 ▲5" },
+  { rank: 1, medal: "🥇", name: "김민지", score: 100, instaCount: 987, delta: "전월 대비 유지" },
+  { rank: 2, medal: "🥈", name: "이준호", score: 85, instaCount: 842, delta: "전월 대비 ▲1" },
+  { rank: 3, medal: "🥉", name: "박서연", score: 77, instaCount: 761, delta: "전월 대비 ▼2" },
+  { rank: 4, medal: "4️⃣", name: "최다인", score: 71, instaCount: 698, delta: "전월 대비 0" },
+  { rank: 5, medal: "5️⃣", name: "정하늘", score: 52, instaCount: 512, delta: "전월 대비 ▲5" },
+  { rank: 6, medal: "6️⃣", name: "홍성진", score: 41, instaCount: 401, delta: "전월 대비 ▼1" },
+  { rank: 7, medal: "7️⃣", name: "류지원", score: 32, instaCount: 312, delta: "전월 대비 유지" },
 ];
 
 function ScoreBar({ value, max }) {
@@ -18,20 +20,88 @@ function ScoreBar({ value, max }) {
   );
 }
 
-function Top5Screen({ onNavigate, appData }) {
-  const { AppShell, SectionLabel, Well } = window;
-  const [selected, setSelected] = useState(null);
+function PaywallModal({ totalLocked, onPay, onClose }) {
+  const [loading, setLoading] = useState(false);
 
-  const hasData = appData && appData.rankings && appData.rankings.length > 0;
-  const rank = hasData ? appData.rankings : DEMO_RANK;
-  const isDemo = appData && appData.isDemo;
-
-  const totalMsgs = rank.reduce((s, f) => s + (f.kakaoCount || 0) + (f.instaCount || 0), 0);
-  const topFriend = rank[0];
-  const maxScore = Math.max(...rank.map((f) => f.score || f.kakaoCount || 1));
+  function handlePay() {
+    setLoading(true);
+    setTimeout(() => {
+      onPay();
+      setLoading(false);
+    }, 1200);
+  }
 
   return (
-    <AppShell activeNav="result" onNavigate={onNavigate}>
+    <div style={{
+      position: "fixed", inset: 0, zIndex: 100,
+      background: "rgba(0,0,0,0.6)", backdropFilter: "blur(4px)",
+      display: "flex", alignItems: "center", justifyContent: "center", padding: 20,
+    }} onClick={onClose}>
+      <div onClick={e => e.stopPropagation()} style={{
+        background: "var(--surface-card)", borderRadius: 24,
+        padding: "28px 24px", maxWidth: 340, width: "100%",
+        boxShadow: "0 20px 60px rgba(0,0,0,0.3)",
+        display: "flex", flexDirection: "column", gap: 18, textAlign: "center",
+      }}>
+        <div style={{ fontSize: 40 }}>🔓</div>
+        <div>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 20, color: "var(--ink-900)", marginBottom: 6 }}>
+            전체 랭킹 보기
+          </div>
+          <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.6 }}>
+            6위부터 {5 + totalLocked}위까지<br/>
+            나머지 <strong style={{ color: "var(--violet-600)" }}>{totalLocked}명</strong>의 순위를 모두 확인해요
+          </div>
+        </div>
+        <div style={{
+          background: "var(--gradient-holo-soft)", borderRadius: 14,
+          padding: "14px 16px",
+        }}>
+          <div style={{ fontSize: 28, fontFamily: "var(--font-display)", color: "var(--ink-900)", fontWeight: 800 }}>₩990</div>
+          <div style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 2 }}>1회 결제 · 평생 열람</div>
+        </div>
+        <Button
+          variant="primary" size="lg"
+          onClick={handlePay}
+          style={{ width: "100%", background: "linear-gradient(135deg, var(--violet-600), var(--pink-500))" }}
+        >
+          {loading ? "결제 중…" : "990원으로 전체 보기"}
+        </Button>
+        <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 12, color: "var(--text-tertiary)", cursor: "pointer" }}>
+          나중에
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function Top5Screen({ onNavigate, appData, isPaid, setIsPaid }) {
+  const { AppShell, SectionLabel, Well } = window;
+  const [selected, setSelected] = useState(null);
+  const [showPaywall, setShowPaywall] = useState(false);
+
+  const hasData = appData && appData.rankings && appData.rankings.length > 0;
+  const allRank = hasData ? appData.rankings : DEMO_RANK;
+  const isDemo = appData && appData.isDemo;
+
+  const freeRank = allRank.slice(0, 5);
+  const lockedRank = allRank.slice(5);
+  const rank = isPaid ? allRank : freeRank;
+
+  const totalMsgs = allRank.reduce((s, f) => s + (f.instaCount || 0), 0);
+  const topFriend = allRank[0];
+  const maxScore = Math.max(...allRank.map((f) => f.score || f.kakaoCount || 1));
+
+  return (
+    <AppShell activeNav="top5" onNavigate={onNavigate}>
+      {showPaywall && (
+        <PaywallModal
+          totalLocked={lockedRank.length}
+          onPay={() => { setIsPaid(true); setShowPaywall(false); }}
+          onClose={() => setShowPaywall(false)}
+        />
+      )}
+
       {isDemo && (
         <div style={{ background: "var(--violet-100)", borderRadius: "var(--radius-md)", padding: "10px 16px", fontSize: 13, color: "var(--violet-700)" }}>
           📊 데모 모드 — 샘플 데이터 기준 결과입니다
@@ -39,7 +109,7 @@ function Top5Screen({ onNavigate, appData }) {
       )}
 
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap", gap: 12 }}>
-        <span style={{ fontFamily: "var(--font-display)", fontSize: 28, color: "var(--ink-900)" }}>TOP 5 랭킹 결과 🏆</span>
+        <span style={{ fontFamily: "var(--font-display)", fontSize: 28, color: "var(--ink-900)" }}>랭킹 결과 🏆</span>
         <Button variant="primary" size="lg" onClick={() => onNavigate("share")}>공유 카드 만들기 💌</Button>
       </div>
 
@@ -54,7 +124,7 @@ function Top5Screen({ onNavigate, appData }) {
         </Well>
         <Well style={{ flex: "1 1 160px" }}>
           <span style={{ fontSize: 11, color: "var(--text-secondary)" }}>분석된 대화 상대</span>
-          <span style={{ fontFamily: "var(--font-display)", fontSize: 24, color: "var(--ink-900)" }}>{appData?.totalContacts || 38}명</span>
+          <span style={{ fontFamily: "var(--font-display)", fontSize: 24, color: "var(--ink-900)" }}>{appData?.totalContacts || allRank.length}명</span>
         </Well>
       </div>
 
@@ -82,7 +152,7 @@ function Top5Screen({ onNavigate, appData }) {
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <ScoreBar value={f.score || f.kakaoCount} max={maxScore} />
                     <span style={{ fontSize: 11, color: "var(--text-secondary)", whiteSpace: "nowrap" }}>
-                      {((f.kakaoCount || 0) + (f.instaCount || 0)).toLocaleString()}회
+                      {(f.instaCount || 0).toLocaleString()}회
                     </span>
                   </div>
                 </div>
@@ -99,15 +169,9 @@ function Top5Screen({ onNavigate, appData }) {
                   padding: "14px 18px 16px", display: "flex", gap: 20, flexWrap: "wrap",
                 }}>
                   <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: "1 1 140px" }}>
-                    <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>💬 카카오톡 대화</span>
-                    <span style={{ fontWeight: 700, fontSize: 18, color: "var(--ink-900)" }}>{(f.kakaoCount || 0).toLocaleString()}건</span>
+                    <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>📷 인스타그램 메시지</span>
+                    <span style={{ fontWeight: 700, fontSize: 18, color: "var(--ink-900)" }}>{(f.instaCount || 0).toLocaleString()}건</span>
                   </div>
-                  {f.instaCount > 0 && (
-                    <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: "1 1 140px" }}>
-                      <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>📷 인스타그램 활동</span>
-                      <span style={{ fontWeight: 700, fontSize: 18, color: "var(--ink-900)" }}>{f.instaCount}건</span>
-                    </div>
-                  )}
                   {f.avgResponseMin && (
                     <div style={{ display: "flex", flexDirection: "column", gap: 4, flex: "1 1 140px" }}>
                       <span style={{ fontSize: 11, color: "var(--text-tertiary)" }}>⚡ 평균 응답 시간</span>
@@ -123,6 +187,58 @@ function Top5Screen({ onNavigate, appData }) {
             </div>
           ))}
         </div>
+
+        {/* 잠긴 영역 */}
+        {!isPaid && lockedRank.length > 0 && (
+          <div style={{ position: "relative" }}>
+            {/* 블러 미리보기 */}
+            <div style={{ filter: "blur(6px)", pointerEvents: "none", display: "flex", flexDirection: "column", gap: 10 }}>
+              {lockedRank.slice(0, 3).map((f) => (
+                <div key={f.name} style={{
+                  display: "flex", alignItems: "center", gap: 16,
+                  background: "var(--surface-card)", border: "1px solid var(--border-soft)",
+                  borderRadius: "var(--radius-lg)", padding: "14px 18px",
+                }}>
+                  <span style={{ fontSize: 24, width: 34 }}>{f.medal}</span>
+                  <Image shape="round" size={44} initials={f.name.slice(0, 1)} />
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontWeight: 800, fontSize: 15, color: "var(--text-primary)" }}>{f.name}</div>
+                    <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+                      {(f.instaCount || 0).toLocaleString()}회
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            {/* 잠금 오버레이 */}
+            <div style={{
+              position: "absolute", inset: 0,
+              display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+              gap: 12, background: "rgba(255,255,255,0.5)", backdropFilter: "blur(2px)",
+              borderRadius: "var(--radius-lg)",
+            }}>
+              <span style={{ fontSize: 32 }}>🔒</span>
+              <div style={{ textAlign: "center" }}>
+                <div style={{ fontWeight: 800, fontSize: 15, color: "var(--ink-900)" }}>6위~{5 + lockedRank.length}위 잠김</div>
+                <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 4 }}>나머지 {lockedRank.length}명의 순위를 확인하려면</div>
+              </div>
+              <Button
+                variant="primary" size="lg"
+                onClick={() => setShowPaywall(true)}
+                style={{ background: "linear-gradient(135deg, var(--violet-600), var(--pink-500))" }}
+              >
+                990원으로 전체 보기 🔓
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {isPaid && (
+          <div style={{ textAlign: "center", fontSize: 12, color: "var(--text-tertiary)" }}>
+            ✅ 전체 랭킹 열람 중
+          </div>
+        )}
+
         <span style={{ fontSize: 11, color: "var(--text-tertiary)", textAlign: "center" }}>친구 행을 클릭하면 상세 소통 정보를 확인할 수 있어요</span>
       </div>
 

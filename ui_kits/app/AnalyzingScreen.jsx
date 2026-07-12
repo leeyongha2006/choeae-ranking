@@ -43,50 +43,77 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
 
   async function runAnalysis() {
     try {
-      const { parseKakaoFile, parseInstagram, computeRankings } = window.DataParser;
+      const { parseInstagram, computeRankings } = window.DataParser;
 
       advance(0, 15);
       await delay(400);
 
-      let kakaoData = null;
-      let instaData = null;
+      let instaData = {};
       let myName = null;
 
-      if (appData.kakaoFiles && appData.kakaoFiles.length > 0) {
-        advance(1, 30);
-        kakaoData = {};
-        for (const file of appData.kakaoFiles) {
-          const text = await readFileAsText(file);
-          const { friendName, count } = parseKakaoFile(file.name, text);
-          kakaoData[friendName] = (kakaoData[friendName] || 0) + count;
+      advance(1, 40);
+
+      for (const file of appData.instaFiles || []) {
+        if (file.name.toLowerCase().endsWith(".zip")) {
+          const zip = await JSZip.loadAsync(file);
+          const zipEntries = Object.values(zip.files).filter(f =>
+            !f.dir && /messages\/inbox\/[^/]+\/message_\d+\.json$/i.test(f.name)
+          );
+
+          const allResults = [];
+          for (const zipEntry of zipEntries) {
+            const text = await zipEntry.async("string");
+            const json = JSON.parse(text);
+            const folderMatch = zipEntry.name.match(/messages\/inbox\/([^/]+)\//i);
+            const folderName = folderMatch ? folderMatch[1] : null;
+            const result = parseInstagram(json, folderName);
+            if (result) allResults.push(result);
+          }
+
+          // 본인 이름 감지: 가장 많은 파일에 sender로 등장하는 이름
+          const senderFileCounts = {};
+          for (const result of allResults) {
+            for (const name of Object.keys(result.counts)) {
+              senderFileCounts[name] = (senderFileCounts[name] || 0) + 1;
+            }
+          }
+          const detectedMyName = Object.entries(senderFileCounts)
+            .sort(([, a], [, b]) => b - a)[0]?.[0] || null;
+          if (!myName && detectedMyName) myName = detectedMyName;
+
+          for (const result of allResults) {
+            const totalInFile = Object.values(result.counts).reduce((a, b) => a + b, 0);
+            const friendName = Object.keys(result.counts).find(n => n !== detectedMyName);
+            if (friendName) {
+              instaData[friendName] = (instaData[friendName] || 0) + totalInFile;
+            }
+          }
+        } else {
+          const json = await readFileAsJSON(file);
+          const result = parseInstagram(json);
+          if (!result) continue;
+          if (!myName && result.myName) myName = result.myName;
+          const totalInFile = Object.values(result.counts).reduce((a, b) => a + b, 0);
+          const friendName = Object.keys(result.counts).find(n => n !== myName);
+          if (friendName) {
+            instaData[friendName] = (instaData[friendName] || 0) + totalInFile;
+          }
         }
-      }
-      if (appData.instaFile) {
-        advance(1, 55);
-        const json = await readFileAsJSON(appData.instaFile);
-        const result = parseInstagram(json);
-        instaData = result.counts;
-        if (!myName && result.myName) myName = result.myName;
       }
 
       advance(2, 75);
       await delay(500);
 
-      const rankings = computeRankings(kakaoData, instaData, myName);
+      const rankings = computeRankings(instaData, myName);
 
-      const totalMessages = Object.values(kakaoData || {}).reduce((a, b) => a + b, 0)
-        + Object.entries(instaData || {}).filter(([n]) => n !== myName).reduce((a, [, b]) => a + b, 0);
-      const totalContacts = new Set([
-        ...Object.keys(kakaoData || {}),
-        ...Object.keys(instaData || {}).filter(n => n !== myName),
-      ]).size;
+      const totalMessages = Object.values(instaData).reduce((a, b) => a + b, 0);
+      const totalContacts = Object.keys(instaData).length;
 
       advance(3, 100);
       await delay(600);
 
       setAppData((prev) => ({
         ...prev,
-        kakaoData,
         instaData,
         rankings,
         totalMessages,
@@ -106,7 +133,7 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
   }
 
   return (
-    <AppShell activeNav="upload" onNavigate={onNavigate}>
+    <AppShell activeNav="upload" onNavigate={onNavigate} hideNav>
       <span style={{ fontFamily: "var(--font-display)", fontSize: 28, color: "var(--ink-900)" }}>
         파일 분석 중입니다
       </span>
