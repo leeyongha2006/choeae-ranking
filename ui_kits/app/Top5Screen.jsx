@@ -20,15 +20,39 @@ function ScoreBar({ value, max }) {
   );
 }
 
-function PaywallModal({ totalLocked, onPay, onClose }) {
+// 토스페이먼츠 클라이언트 키 — 대시보드(https://developers.tosspayments.com)에서 발급 후 교체
+const TOSS_CLIENT_KEY = "test_ck_6BYq7GWPVvyLLogZM5YI3NE5vbo1";
+
+function PaywallModal({ totalLocked, appData, onPay, onClose }) {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   function handlePay() {
     setLoading(true);
-    setTimeout(() => {
-      onPay();
+    setError(null);
+
+    try {
+      // 결제 후 돌아왔을 때 데이터 복원용
+      sessionStorage.setItem("rankingAppData", JSON.stringify(appData));
+    } catch {}
+
+    const orderId = "order_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+    const baseUrl = window.location.origin + window.location.pathname;
+
+    const tossPayments = TossPayments(TOSS_CLIENT_KEY);
+    tossPayments.requestPayment("카드", {
+      amount: 990,
+      orderId,
+      orderName: "최애친구 랭킹 전체 보기",
+      customerName: "사용자",
+      successUrl: baseUrl + "?payment=success",
+      failUrl: baseUrl + "?payment=fail",
+    }).catch((e) => {
       setLoading(false);
-    }, 1200);
+      if (e.code !== "USER_CANCEL") {
+        setError("결제 중 오류가 발생했어요: " + e.message);
+      }
+    });
   }
 
   return (
@@ -49,7 +73,7 @@ function PaywallModal({ totalLocked, onPay, onClose }) {
             전체 랭킹 보기
           </div>
           <div style={{ fontSize: 13, color: "var(--text-secondary)", lineHeight: 1.6 }}>
-            6위부터 {5 + totalLocked}위까지<br/>
+            4위부터 {3 + totalLocked}위까지<br/>
             나머지 <strong style={{ color: "var(--violet-600)" }}>{totalLocked}명</strong>의 순위를 모두 확인해요
           </div>
         </div>
@@ -60,12 +84,18 @@ function PaywallModal({ totalLocked, onPay, onClose }) {
           <div style={{ fontSize: 28, fontFamily: "var(--font-display)", color: "var(--ink-900)", fontWeight: 800 }}>₩990</div>
           <div style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 2 }}>1회 결제 · 평생 열람</div>
         </div>
+        {error && (
+          <div style={{ fontSize: 12, color: "#e53e3e", background: "#fff5f5", borderRadius: 10, padding: "10px 14px" }}>
+            {error}
+          </div>
+        )}
         <Button
           variant="primary" size="lg"
           onClick={handlePay}
-          style={{ width: "100%", background: "linear-gradient(135deg, var(--violet-600), var(--pink-500))" }}
+          disabled={loading}
+          style={{ width: "100%", background: "linear-gradient(135deg, var(--violet-600), var(--pink-500))", opacity: loading ? 0.7 : 1 }}
         >
-          {loading ? "결제 중…" : "990원으로 전체 보기"}
+          {loading ? "결제창 열리는 중…" : "990원으로 전체 보기 💳"}
         </Button>
         <button onClick={onClose} style={{ background: "none", border: "none", fontSize: 12, color: "var(--text-tertiary)", cursor: "pointer" }}>
           나중에
@@ -84,8 +114,8 @@ function Top5Screen({ onNavigate, appData, isPaid, setIsPaid }) {
   const allRank = hasData ? appData.rankings : DEMO_RANK;
   const isDemo = appData && appData.isDemo;
 
-  const freeRank = allRank.slice(0, 5);
-  const lockedRank = allRank.slice(5);
+  const freeRank = allRank.slice(0, 3);
+  const lockedRank = allRank.slice(3);
   const rank = isPaid ? allRank : freeRank;
 
   const totalMsgs = allRank.reduce((s, f) => s + (f.instaCount || 0), 0);
@@ -97,6 +127,7 @@ function Top5Screen({ onNavigate, appData, isPaid, setIsPaid }) {
       {showPaywall && (
         <PaywallModal
           totalLocked={lockedRank.length}
+          appData={appData}
           onPay={() => { setIsPaid(true); setShowPaywall(false); }}
           onClose={() => setShowPaywall(false)}
         />
@@ -129,7 +160,7 @@ function Top5Screen({ onNavigate, appData, isPaid, setIsPaid }) {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <SectionLabel>나의 최애 친구 순위</SectionLabel>
+        <SectionLabel>나의 최애 친구 TOP 3</SectionLabel>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {rank.map((f, i) => (
             <div key={f.name}>
@@ -219,7 +250,7 @@ function Top5Screen({ onNavigate, appData, isPaid, setIsPaid }) {
             }}>
               <span style={{ fontSize: 32 }}>🔒</span>
               <div style={{ textAlign: "center" }}>
-                <div style={{ fontWeight: 800, fontSize: 15, color: "var(--ink-900)" }}>6위~{5 + lockedRank.length}위 잠김</div>
+                <div style={{ fontWeight: 800, fontSize: 15, color: "var(--ink-900)" }}>4위~{3 + lockedRank.length}위 잠김</div>
                 <div style={{ fontSize: 12, color: "var(--text-secondary)", marginTop: 4 }}>나머지 {lockedRank.length}명의 순위를 확인하려면</div>
               </div>
               <Button

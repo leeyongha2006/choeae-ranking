@@ -33,7 +33,7 @@ function DashboardScreen({ onNavigate, appData }) {
           <div style={{ fontSize: 12, color: "var(--text-tertiary)", marginTop: 2 }}>{uploadedAt} 기준 분석</div>
         </div>
         <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
-          <Button variant="primary" onClick={() => onNavigate("top5")}>TOP 5 상세 보기</Button>
+          <Button variant="primary" onClick={() => onNavigate("top5")}>전체 랭킹 보기</Button>
         </div>
       </div>
 
@@ -55,9 +55,9 @@ function DashboardScreen({ onNavigate, appData }) {
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        <SectionLabel>TOP 5 친구 미리보기</SectionLabel>
+        <SectionLabel>TOP 3 친구 미리보기</SectionLabel>
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {top5.map((f) => (
+          {top5.slice(0, 3).map((f) => (
             <div
               key={f.name}
               style={{
@@ -86,7 +86,7 @@ function DashboardScreen({ onNavigate, appData }) {
 
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <Button variant="default" onClick={() => onNavigate("mypage")}>마이페이지 / 설정</Button>
-        <Button variant="primary" size="lg" onClick={() => onNavigate("top5")}>TOP 5 상세 분석 보기</Button>
+        <Button variant="primary" size="lg" onClick={() => onNavigate("top5")}>전체 랭킹 보기</Button>
       </div>
     </AppShell>
   );

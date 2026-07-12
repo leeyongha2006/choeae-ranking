@@ -1,5 +1,5 @@
 (function () {
-const { useState } = React;
+const { useState, useEffect } = React;
 
 const SCREENS = {
   onboarding: () => window.OnboardingScreen,
@@ -36,6 +36,23 @@ function App() {
     setIsPaidState(v);
     saveIsPaid(v);
   }
+
+  // 토스 결제 성공 리다이렉트 처리
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("payment") === "success") {
+      try {
+        const saved = sessionStorage.getItem("rankingAppData");
+        if (saved) {
+          setAppData(JSON.parse(saved));
+          sessionStorage.removeItem("rankingAppData");
+        }
+      } catch {}
+      setIsPaid(true);
+      window.history.replaceState({}, "", window.location.pathname);
+      setScreen("top5");
+    }
+  }, []);
 
   const Screen = SCREENS[screen]();
 

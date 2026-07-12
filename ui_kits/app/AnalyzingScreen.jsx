@@ -122,7 +122,7 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
       }));
 
       await delay(700);
-      onNavigate("dashboard");
+      onNavigate("top5");
     } catch (e) {
       setError("파일을 읽는 중 오류가 발생했어요: " + e.message);
     }
