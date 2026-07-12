@@ -6,7 +6,7 @@ function OnboardingScreen({ onNavigate }) {
       minHeight: "100dvh",
       background: "#0d0d0d",
       display: "flex", flexDirection: "column",
-      alignItems: "center", justifyContent: "space-between",
+      alignItems: "center", justifyContent: "flex-end", gap: 48,
       padding: "60px 24px 48px",
       boxSizing: "border-box",
       position: "relative", overflow: "hidden",
@@ -40,37 +40,6 @@ function OnboardingScreen({ onNavigate }) {
         <p style={{ fontSize: 15, color: "#888", margin: 0, lineHeight: 1.7 }}>
           인스타 DM 기록 하나면<br />소통 순위가 딱 나와요
         </p>
-      </div>
-
-      {/* 티저 카드 */}
-      <div style={{ width: "100%", maxWidth: 380, display: "flex", flexDirection: "column", gap: 10 }}>
-        {[
-          { rank: "1", medal: "🥇", name: "???", msg: "987회", top: true },
-          { rank: "2", medal: "🥈", name: "???", msg: "842회" },
-          { rank: "3", medal: "🥉", name: "???", msg: "761회" },
-        ].map((f) => (
-          <div key={f.rank} style={{
-            display: "flex", alignItems: "center", gap: 14,
-            background: f.top ? "rgba(225,48,108,0.12)" : "rgba(255,255,255,0.05)",
-            border: f.top ? "1px solid rgba(225,48,108,0.3)" : "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 16, padding: "14px 18px",
-            filter: "blur(3px)",
-            userSelect: "none",
-          }}>
-            <span style={{ fontSize: 22 }}>{f.medal}</span>
-            <div style={{ flex: 1 }}>
-              <div style={{ fontWeight: 800, fontSize: 15, color: "#fff", fontFamily: "var(--font-display)" }}>{f.name}</div>
-              <div style={{ fontSize: 12, color: "#666", marginTop: 2 }}>{f.msg} 대화</div>
-            </div>
-            <div style={{ fontWeight: 900, fontSize: 22, color: f.top ? "#e1306c" : "#555", fontFamily: "var(--font-display)" }}>
-              {f.top ? "100" : "—"}
-            </div>
-          </div>
-        ))}
-        <div style={{
-          marginTop: 4, textAlign: "center",
-          fontSize: 12, color: "#555",
-        }}>파일 올리면 바로 공개돼요 👇</div>
       </div>
 
       {/* CTA */}

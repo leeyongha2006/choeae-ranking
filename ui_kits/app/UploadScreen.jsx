@@ -36,7 +36,7 @@ const INSTA_STEPS = [
     num: 6,
     title: "형식 JSON · 기간 선택",
     desc: "'정보 맞춤 설정'에서 '메시지'만 체크하고 나머지는 해제해요. '기간'을 원하는 범위로, '형식'을 JSON으로 바꾼 뒤 '내보내기 시작'을 탭해요.",
-    tip: "형식을 반드시 JSON으로! 기간은 아무거나 선택 가능해요.",
+    tip: "JSON 꼭 선택해야 해요! 기간은 뭐든 상관없어요",
     img: "./guide_imgs/insta_step6_config.svg",
   },
   {
