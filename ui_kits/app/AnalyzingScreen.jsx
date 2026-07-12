@@ -1,5 +1,4 @@
 (function () {
-const { Button } = window.DesignSystem_8db18d;
 const { useEffect, useState, useRef } = React;
 
 const STEPS = [
@@ -10,7 +9,7 @@ const STEPS = [
 ];
 
 function AnalyzingScreen({ onNavigate, appData, setAppData }) {
-  const { AppShell, SectionLabel, Well } = window;
+  const { AppShell } = window;
   const [step, setStep] = useState(0);
   const [pct, setPct] = useState(0);
   const [error, setError] = useState(null);
@@ -22,18 +21,13 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
     runAnalysis();
   }, []);
 
-  async function readFileAsText(file) {
+  async function readFileAsJSON(file) {
     return new Promise((res, rej) => {
       const fr = new FileReader();
-      fr.onload = (e) => res(e.target.result);
+      fr.onload = (e) => { try { res(JSON.parse(e.target.result)); } catch (err) { rej(err); } };
       fr.onerror = rej;
       fr.readAsText(file, "utf-8");
     });
-  }
-
-  async function readFileAsJSON(file) {
-    const text = await readFileAsText(file);
-    return JSON.parse(text);
   }
 
   function advance(newStep, newPct) {
@@ -70,7 +64,6 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
             if (result) allResults.push(result);
           }
 
-          // 본인 이름 감지: 가장 많은 파일에 sender로 등장하는 이름
           const senderFileCounts = {};
           for (const result of allResults) {
             for (const name of Object.keys(result.counts)) {
@@ -105,7 +98,6 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
       await delay(500);
 
       const rankings = computeRankings(instaData, myName);
-
       const totalMessages = Object.values(instaData).reduce((a, b) => a + b, 0);
       const totalContacts = Object.keys(instaData).length;
 
@@ -134,52 +126,87 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
 
   return (
     <AppShell activeNav="upload" onNavigate={onNavigate} hideNav>
-      <span style={{ fontFamily: "var(--font-display)", fontSize: 28, color: "var(--ink-900)" }}>
-        파일 분석 중입니다
-      </span>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 32, paddingTop: 40 }}>
+        {/* 헤딩 */}
+        <div>
+          <div style={{ fontSize: 12, fontWeight: 700, color: "#e1306c", letterSpacing: "0.08em", marginBottom: 10 }}>
+            분석 중
+          </div>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 28, fontWeight: 900, color: "#111", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
+            찐친 찾는 중<br />잠깐만요… 🔍
+          </div>
+        </div>
 
-      <Well>
-        <span style={{ fontWeight: 700, fontSize: 15, color: "var(--text-primary)" }}>
-          업로드된 데이터를 열심히 분석하고 있어요 🔍
-        </span>
-        <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>잠시만 기다려주세요.</span>
-      </Well>
-
-      <Well>
-        <SectionLabel>처리 진행률</SectionLabel>
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-          <div style={{ flex: 1, height: 14, borderRadius: "var(--radius-pill)", background: "var(--paper-200)", overflow: "hidden" }}>
+        {/* 진행률 바 */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+            <span style={{ fontSize: 13, color: "#999" }}>진행률</span>
+            <span style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 900, color: pct === 100 ? "#22c55e" : "#e1306c" }}>
+              {pct}%
+            </span>
+          </div>
+          <div style={{ height: 6, background: "#f0f0f0", borderRadius: 99, overflow: "hidden" }}>
             <div style={{
               width: `${pct}%`, height: "100%",
-              background: pct === 100 ? "var(--gradient-mint-violet)" : "var(--gradient-holo)",
-              borderRadius: "var(--radius-pill)",
-              transition: "width 500ms var(--ease-out)",
+              background: pct === 100
+                ? "linear-gradient(90deg, #22c55e, #16a34a)"
+                : "linear-gradient(90deg, #f09433, #e1306c)",
+              borderRadius: 99,
+              transition: "width 500ms cubic-bezier(0.22,1,0.36,1)",
             }} />
           </div>
-          <span style={{ fontWeight: 700, fontSize: 15, color: "var(--text-primary)", minWidth: 42, textAlign: "right" }}>{pct}%</span>
         </div>
-      </Well>
 
-      <Well>
-        {STEPS.map((s, i) => {
-          const done = i < step || (i === step && pct >= 100);
-          const active = i === step && pct < 100;
-          return (
-            <div key={s.key} style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: done ? "var(--text-primary)" : active ? "var(--violet-600)" : "var(--text-tertiary)" }}>
-              <span>{done ? "✅" : active ? "⏳" : "○"}</span>
-              <span style={{ fontWeight: active ? 700 : 400 }}>{s.label}</span>
-            </div>
-          );
-        })}
-      </Well>
+        {/* 스텝 리스트 */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          {STEPS.map((s, i) => {
+            const done = i < step || (i === step && pct >= 100);
+            const active = i === step && pct < 100;
+            return (
+              <div key={s.key} style={{
+                display: "flex", alignItems: "center", gap: 12,
+                opacity: done ? 1 : active ? 1 : 0.35,
+                transition: "opacity 300ms",
+              }}>
+                <div style={{
+                  width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
+                  background: done ? "#22c55e" : active ? "#e1306c" : "#eee",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 13, color: done || active ? "#fff" : "#999",
+                  fontWeight: 900,
+                }}>
+                  {done ? "✓" : i + 1}
+                </div>
+                <span style={{
+                  fontSize: 14, fontWeight: active ? 800 : done ? 700 : 400,
+                  color: done ? "#111" : active ? "#e1306c" : "#999",
+                }}>
+                  {s.label}
+                </span>
+              </div>
+            );
+          })}
+        </div>
 
-      {error && (
-        <Well style={{ background: "var(--orange-100)", border: "1px solid var(--color-warning)" }}>
-          <span style={{ fontWeight: 700, fontSize: 14, color: "var(--ink-900)" }}>⚠️ 오류가 발생했어요</span>
-          <span style={{ fontSize: 12, color: "var(--text-secondary)" }}>{error}</span>
-          <Button variant="secondary" size="sm" onClick={() => onNavigate("upload")}>파일 업로드로 돌아가기</Button>
-        </Well>
-      )}
+        {/* 에러 */}
+        {error && (
+          <div style={{
+            background: "#fff8f0", border: "1px solid #fde7cc",
+            borderRadius: 14, padding: "16px",
+          }}>
+            <div style={{ fontWeight: 800, fontSize: 14, color: "#c05a00", marginBottom: 8 }}>⚠️ 오류가 발생했어요</div>
+            <div style={{ fontSize: 12, color: "#666", marginBottom: 14 }}>{error}</div>
+            <button
+              onClick={() => onNavigate("upload")}
+              style={{
+                padding: "10px 18px", background: "#111", border: "none",
+                borderRadius: 10, fontFamily: "var(--font-body)",
+                fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer",
+              }}
+            >파일 업로드로 돌아가기</button>
+          </div>
+        )}
+      </div>
     </AppShell>
   );
 }
