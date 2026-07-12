@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 375 220" width="375" height="220">
+  <rect width="375" height="220" fill="#0a0a0a"/>
+
+  <!-- Top bar -->
+  <text x="187" y="24" font-family="sans-serif" font-size="15" font-weight="bold" fill="white" text-anchor="middle">계정 센터</text>
+
+  <!-- Divider -->
+  <line x1="0" y1="36" x2="375" y2="36" stroke="#222" stroke-width="1"/>
+
+  <!-- Account row (highlighted - what user should tap) -->
+  <rect x="16" y="46" width="343" height="58" rx="10" fill="#1a1a1a" stroke="#e1306c" stroke-width="2"/>
+
+  <!-- Profile avatar circle -->
+  <circle cx="46" cy="75" r="18" fill="#333"/>
+  <circle cx="46" cy="68" r="8" fill="#555"/>
+  <ellipse cx="46" cy="90" rx="13" ry="8" fill="#555"/>
+
+  <!-- Instagram badge -->
+  <rect x="56" y="82" width="14" height="14" rx="3" fill="url(#ig)"/>
+  <defs>
+    <linearGradient id="ig" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#f09433"/>
+      <stop offset="100%" stop-color="#bc1888"/>
+    </linearGradient>
+  </defs>
+  <rect x="58" y="84" width="10" height="10" rx="2.5" fill="none" stroke="white" stroke-width="1"/>
+
+  <text x="80" y="70" font-family="sans-serif" font-size="13" font-weight="bold" fill="white">yong._.ha06</text>
+  <text x="80" y="86" font-family="sans-serif" font-size="11" fill="#aaa">Instagram</text>
+  <text x="80" y="100" font-family="sans-serif" font-size="10" fill="#666">기기로 내보내기 · 1회</text>
+
+  <!-- Tap label -->
+  <text x="348" y="79" font-family="sans-serif" font-size="12" fill="#e1306c" text-anchor="end" font-weight="bold">탭!</text>
+
+  <!-- Other menu items (dimmed) -->
+  <rect x="16" y="112" width="343" height="36" rx="8" fill="#111"/>
+  <text x="32" y="135" font-family="sans-serif" font-size="12" fill="#444">알림 받기</text>
+  <text x="348" y="135" font-family="sans-serif" font-size="12" fill="#333" text-anchor="end">›</text>
+
+  <rect x="16" y="154" width="343" height="36" rx="8" fill="#111"/>
+  <text x="32" y="177" font-family="sans-serif" font-size="12" fill="#444">비밀번호 및 보안</text>
+  <text x="348" y="177" font-family="sans-serif" font-size="12" fill="#333" text-anchor="end">›</text>
+
+  <!-- Bottom hint -->
+  <text x="187" y="210" font-family="sans-serif" font-size="11" fill="#e1306c" text-anchor="middle" font-weight="bold">↑ 내 계정 탭하기</text>
+</svg>

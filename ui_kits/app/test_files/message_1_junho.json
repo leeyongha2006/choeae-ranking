@@ -1,0 +1,14 @@
+﻿{
+  "participants": [
+    {"name": "me_user"},
+    {"name": "이준호"}
+  ],
+  "messages": [
+    {"sender_name": "이준호", "timestamp_ms": 1720000000000, "content": "야"},
+    {"sender_name": "me_user", "timestamp_ms": 1720000010000, "content": "왜"},
+    {"sender_name": "이준호", "timestamp_ms": 1720000020000, "content": "게임 할래"},
+    {"sender_name": "이준호", "timestamp_ms": 1720000030000, "content": "빨리"},
+    {"sender_name": "me_user", "timestamp_ms": 1720000040000, "content": "ㅇㅋ"},
+    {"sender_name": "이준호", "timestamp_ms": 1720000050000, "content": "ㄱㄱ"}
+  ]
+}

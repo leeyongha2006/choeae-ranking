@@ -1,0 +1,18 @@
+﻿{
+  "participants": [
+    {"name": "me_user"},
+    {"name": "김민지"}
+  ],
+  "messages": [
+    {"sender_name": "김민지", "timestamp_ms": 1720000000000, "content": "안녕!"},
+    {"sender_name": "me_user", "timestamp_ms": 1720000010000, "content": "ㅎㅎ 뭐해"},
+    {"sender_name": "김민지", "timestamp_ms": 1720000020000, "content": "그냥 집에 있어"},
+    {"sender_name": "김민지", "timestamp_ms": 1720000030000, "content": "밥 먹었어?"},
+    {"sender_name": "me_user", "timestamp_ms": 1720000040000, "content": "아직"},
+    {"sender_name": "김민지", "timestamp_ms": 1720000050000, "content": "빨리 먹어"},
+    {"sender_name": "me_user", "timestamp_ms": 1720000060000, "content": "ㅋㅋ"},
+    {"sender_name": "김민지", "timestamp_ms": 1720000070000, "content": "오늘 뭐 해?"},
+    {"sender_name": "me_user", "timestamp_ms": 1720000080000, "content": "아직 몰라"},
+    {"sender_name": "김민지", "timestamp_ms": 1720000090000, "content": "나랑 카페 갈래?"}
+  ]
+}
