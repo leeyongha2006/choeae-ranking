@@ -30,10 +30,7 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
     });
   }
 
-  function advance(newStep, newPct) {
-    setStep(newStep);
-    setPct(newPct);
-  }
+  function advance(newStep, newPct) { setStep(newStep); setPct(newPct); }
 
   async function runAnalysis() {
     try {
@@ -105,11 +102,7 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
       await delay(600);
 
       setAppData((prev) => ({
-        ...prev,
-        instaData,
-        rankings,
-        totalMessages,
-        totalContacts,
+        ...prev, instaData, rankings, totalMessages, totalContacts,
         uploadedAt: new Date().toLocaleDateString("ko-KR"),
       }));
 
@@ -120,19 +113,17 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
     }
   }
 
-  function delay(ms) {
-    return new Promise((r) => setTimeout(r, ms));
-  }
+  function delay(ms) { return new Promise((r) => setTimeout(r, ms)); }
 
   return (
     <AppShell activeNav="upload" onNavigate={onNavigate} hideNav>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", justifyContent: "center", gap: 32, paddingTop: 40 }}>
+      <div style={{ display: "flex", flexDirection: "column", justifyContent: "center", gap: 40, paddingTop: 48, minHeight: "70vh" }}>
         {/* 헤딩 */}
         <div>
           <div style={{ fontSize: 12, fontWeight: 700, color: "#e1306c", letterSpacing: "0.08em", marginBottom: 10 }}>
             분석 중
           </div>
-          <div style={{ fontFamily: "var(--font-display)", fontSize: 28, fontWeight: 900, color: "#111", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 30, fontWeight: 900, color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
             찐친 찾는 중<br />잠깐만요… 🔍
           </div>
         </div>
@@ -140,12 +131,12 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
         {/* 진행률 바 */}
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <span style={{ fontSize: 13, color: "#999" }}>진행률</span>
-            <span style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 900, color: pct === 100 ? "#22c55e" : "#e1306c" }}>
+            <span style={{ fontSize: 13, color: "#555" }}>진행률</span>
+            <span style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 900, color: pct === 100 ? "#4ade80" : "#e1306c" }}>
               {pct}%
             </span>
           </div>
-          <div style={{ height: 6, background: "#f0f0f0", borderRadius: 99, overflow: "hidden" }}>
+          <div style={{ height: 6, background: "#1e1e1e", borderRadius: 99, overflow: "hidden" }}>
             <div style={{
               width: `${pct}%`, height: "100%",
               background: pct === 100
@@ -158,28 +149,27 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
         </div>
 
         {/* 스텝 리스트 */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
           {STEPS.map((s, i) => {
             const done = i < step || (i === step && pct >= 100);
             const active = i === step && pct < 100;
             return (
               <div key={s.key} style={{
-                display: "flex", alignItems: "center", gap: 12,
-                opacity: done ? 1 : active ? 1 : 0.35,
+                display: "flex", alignItems: "center", gap: 14,
+                opacity: done ? 1 : active ? 1 : 0.3,
                 transition: "opacity 300ms",
               }}>
                 <div style={{
-                  width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
-                  background: done ? "#22c55e" : active ? "#e1306c" : "#eee",
+                  width: 30, height: 30, borderRadius: "50%", flexShrink: 0,
+                  background: done ? "#22c55e" : active ? "#e1306c" : "#1e1e1e",
                   display: "flex", alignItems: "center", justifyContent: "center",
-                  fontSize: 13, color: done || active ? "#fff" : "#999",
-                  fontWeight: 900,
+                  fontSize: 13, color: "#fff", fontWeight: 900,
                 }}>
                   {done ? "✓" : i + 1}
                 </div>
                 <span style={{
-                  fontSize: 14, fontWeight: active ? 800 : done ? 700 : 400,
-                  color: done ? "#111" : active ? "#e1306c" : "#999",
+                  fontSize: 15, fontWeight: active ? 800 : done ? 700 : 400,
+                  color: done ? "#fff" : active ? "#e1306c" : "#555",
                 }}>
                   {s.label}
                 </span>
@@ -188,18 +178,17 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
           })}
         </div>
 
-        {/* 에러 */}
         {error && (
           <div style={{
-            background: "#fff8f0", border: "1px solid #fde7cc",
-            borderRadius: 14, padding: "16px",
+            background: "rgba(240,148,51,0.1)", border: "1px solid rgba(240,148,51,0.2)",
+            borderRadius: 14, padding: "18px",
           }}>
-            <div style={{ fontWeight: 800, fontSize: 14, color: "#c05a00", marginBottom: 8 }}>⚠️ 오류가 발생했어요</div>
-            <div style={{ fontSize: 12, color: "#666", marginBottom: 14 }}>{error}</div>
+            <div style={{ fontWeight: 800, fontSize: 14, color: "#f09433", marginBottom: 8 }}>⚠️ 오류가 발생했어요</div>
+            <div style={{ fontSize: 12, color: "#888", marginBottom: 14 }}>{error}</div>
             <button
               onClick={() => onNavigate("upload")}
               style={{
-                padding: "10px 18px", background: "#111", border: "none",
+                padding: "10px 18px", background: "#1e1e1e", border: "none",
                 borderRadius: 10, fontFamily: "var(--font-body)",
                 fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer",
               }}

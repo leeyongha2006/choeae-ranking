@@ -48,7 +48,7 @@ function AppShell({ activeNav, onNavigate, children, hideNav }) {
   return (
     <div style={{
       minHeight: "100vh",
-      background: "#fff",
+      background: "#0d0d0d",
       display: "flex", flexDirection: "column",
       fontFamily: "var(--font-body)",
     }}>
@@ -72,9 +72,9 @@ function AppShell({ activeNav, onNavigate, children, hideNav }) {
       {!hideNav && (
         <nav style={{
           position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50,
-          background: "rgba(255,255,255,0.97)",
+          background: "rgba(13,13,13,0.96)",
           backdropFilter: "blur(20px)",
-          borderTop: "1px solid #f0f0f0",
+          borderTop: "1px solid rgba(255,255,255,0.07)",
           display: "flex",
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
         }}>
@@ -104,7 +104,7 @@ function AppShell({ activeNav, onNavigate, children, hideNav }) {
                 <span style={{
                   fontSize: 10, fontWeight: isActive ? 700 : 500,
                   fontFamily: "var(--font-body)",
-                  color: isActive ? "#e1306c" : "#999",
+                  color: isActive ? "#e1306c" : "#555",
                   letterSpacing: "-0.01em",
                 }}>{t.label}</span>
               </button>
@@ -120,7 +120,7 @@ function SectionLabel({ children }) {
   return (
     <span style={{
       fontFamily: "var(--font-body)", fontWeight: 700,
-      fontSize: 15, color: "#111",
+      fontSize: 15, color: "#fff",
     }}>{children}</span>
   );
 }
@@ -128,11 +128,12 @@ function SectionLabel({ children }) {
 function Well({ children, style }) {
   return (
     <div style={{
-      background: "#f7f7f7",
+      background: "#161616",
       borderRadius: 16,
       padding: "16px 18px",
       display: "flex", flexDirection: "column", gap: 12,
       boxSizing: "border-box",
+      border: "1px solid #1e1e1e",
       ...style,
     }}>
       {children}
@@ -143,10 +144,9 @@ function Well({ children, style }) {
 function Card({ children, style }) {
   return (
     <div style={{
-      background: "#fff",
+      background: "#161616",
       borderRadius: 16,
-      border: "1px solid #f0f0f0",
-      boxShadow: "0 2px 12px rgba(0,0,0,0.05)",
+      border: "1px solid #1e1e1e",
       padding: "18px 18px",
       boxSizing: "border-box",
       ...style,

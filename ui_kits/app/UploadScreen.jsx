@@ -1,5 +1,5 @@
 (function () {
-const { useState, useRef, useEffect } = React;
+const { useState, useRef } = React;
 
 const INSTA_STEPS = [
   {
@@ -86,15 +86,15 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
           <div style={{ fontSize: 12, fontWeight: 700, color: "#e1306c", letterSpacing: "0.06em", marginBottom: 4 }}>
             STEP {current + 1} / {total}
           </div>
-          <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 900, color: "#111", letterSpacing: "-0.02em" }}>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 22, fontWeight: 900, color: "#fff", letterSpacing: "-0.02em" }}>
             파일 가져오기
           </div>
         </div>
         <button
           onClick={() => onNavigate("onboarding")}
           style={{
-            padding: "8px 14px", background: "#f5f5f5", border: "none",
-            borderRadius: 99, fontSize: 13, fontWeight: 600, color: "#666", cursor: "pointer",
+            padding: "8px 14px", background: "#1e1e1e", border: "none",
+            borderRadius: 99, fontSize: 13, fontWeight: 600, color: "#888", cursor: "pointer",
           }}
         >
           ← 뒤로
@@ -110,8 +110,8 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
             style={{
               flex: 1, height: 3, borderRadius: 99, cursor: "pointer",
               background: i <= current
-                ? `linear-gradient(90deg, #f09433, #e1306c)`
-                : "#eee",
+                ? "linear-gradient(90deg, #f09433, #e1306c)"
+                : "#2a2a2a",
               transition: "background 200ms",
             }}
           />
@@ -121,10 +121,10 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
       {/* 스텝 콘텐츠 */}
       <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
         <div>
-          <div style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 900, color: "#111", marginBottom: 8 }}>
+          <div style={{ fontFamily: "var(--font-display)", fontSize: 20, fontWeight: 900, color: "#fff", marginBottom: 8 }}>
             {step.title}
           </div>
-          <div style={{ fontSize: 14, color: "#555", lineHeight: 1.7 }}>
+          <div style={{ fontSize: 14, color: "#888", lineHeight: 1.7 }}>
             {step.desc}
           </div>
         </div>
@@ -132,15 +132,15 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
         {step.tip && (
           <div style={{
             padding: "12px 14px",
-            background: "#fff8f0", border: "1px solid #fde7cc",
-            borderRadius: 12, fontSize: 13, color: "#c05a00", lineHeight: 1.6,
+            background: "rgba(240,148,51,0.1)", border: "1px solid rgba(240,148,51,0.2)",
+            borderRadius: 12, fontSize: 13, color: "#f09433", lineHeight: 1.6,
           }}>
             💡 {step.tip}
           </div>
         )}
 
         {step.img && (
-          <div style={{ borderRadius: 16, overflow: "hidden", border: "1px solid #f0f0f0", background: "#111" }}>
+          <div style={{ borderRadius: 16, overflow: "hidden", border: "1px solid #1e1e1e", background: "#111" }}>
             <img
               src={step.img}
               alt={step.title}
@@ -149,23 +149,22 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
           </div>
         )}
 
-        {/* 파일 업로드 영역 */}
         {step.isUploadStep && (
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             {files.map((f, i) => (
               <div key={i} style={{
                 display: "flex", alignItems: "center", gap: 10,
                 padding: "10px 14px",
-                background: "#f0fdf4", border: "1.5px solid #22c55e",
+                background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.25)",
                 borderRadius: 12,
               }}>
                 <span style={{ fontSize: 16 }}>✅</span>
-                <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: "#15803d", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                <div style={{ flex: 1, minWidth: 0, fontSize: 13, fontWeight: 700, color: "#4ade80", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                   {f.name}
                 </div>
                 <button onClick={() => setFiles(prev => prev.filter((_, j) => j !== i))} style={{
                   background: "none", border: "none", cursor: "pointer",
-                  fontSize: 14, color: "#94a3b8", padding: "2px",
+                  fontSize: 14, color: "#555", padding: "2px",
                 }}>✕</button>
               </div>
             ))}
@@ -173,8 +172,8 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
               onClick={() => fileRef.current.click()}
               style={{
                 width: "100%", padding: "16px",
-                background: "#fafafa",
-                border: "2px dashed #e1306c",
+                background: "transparent",
+                border: "2px dashed rgba(225,48,108,0.4)",
                 borderRadius: 14, cursor: "pointer",
                 fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 700,
                 color: "#e1306c",
@@ -198,10 +197,10 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
           disabled={current === 0}
           style={{
             flex: 1, padding: "14px",
-            background: "#f5f5f5", border: "none",
+            background: "#1e1e1e", border: "none",
             borderRadius: 14,
             fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 700,
-            color: current === 0 ? "#ccc" : "#555",
+            color: current === 0 ? "#333" : "#888",
             cursor: current === 0 ? "default" : "pointer",
           }}
         >← 이전</button>
@@ -224,10 +223,10 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
               flex: 2, padding: "14px",
               background: files.length > 0
                 ? "linear-gradient(135deg, #f09433, #e1306c)"
-                : "#eee",
+                : "#1e1e1e",
               border: "none", borderRadius: 14,
               fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 900,
-              color: files.length > 0 ? "#fff" : "#aaa",
+              color: files.length > 0 ? "#fff" : "#444",
               cursor: files.length > 0 ? "pointer" : "default",
             }}
           >
