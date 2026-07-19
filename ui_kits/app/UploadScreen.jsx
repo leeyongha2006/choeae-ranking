@@ -1,43 +1,53 @@
 (function () {
-const { useState, useRef } = React;
+const { useState, useRef, useEffect } = React;
 
 const INSTA_STEPS = [
   {
     num: 1,
     title: "계정 센터 열기",
     desc: "인스타그램에서 ☰ → '설정 및 개인정보'를 탭해요. 화면 위쪽 '계정 센터'를 탭해요.",
-    img: "./guide_imgs/insta_step1_settings.png",
+    img: "/ui_kits/app/guide_imgs/insta_step1_settings.png",
+    highlights: [{ top: "4%", left: "2%", width: "96%", height: "88%", borderRadius: 8 }],
   },
   {
     num: 2,
     title: "'내 정보 및 권한' 탭하기",
     desc: "계정 설정 화면에서 '내 정보 및 권한'을 탭해요.",
-    img: "./guide_imgs/insta_step2_account.png",
+    img: "/ui_kits/app/guide_imgs/insta_step2_account.png",
+    highlights: [{ top: "43%", left: "2%", width: "96%", height: "21%", borderRadius: 8 }],
   },
   {
     num: 3,
     title: "'내 정보 내보내기' 탭하기",
     desc: "'내 정보 내보내기'를 탭해요. 바로 아래 나오는 '내보내기 만들기' 버튼을 탭해요.",
-    img: "./guide_imgs/insta_step3_myinfo.png",
+    img: "/ui_kits/app/guide_imgs/insta_step3_myinfo.png",
+    highlights: [{ top: "40%", left: "2%", width: "96%", height: "21%", borderRadius: 8 }],
   },
   {
     num: 4,
     title: "계정 선택하기",
     desc: "'내보내기 만들기' 팝업이 뜨면 버튼을 탭해요. 계정 선택 화면에서 내 계정을 선택해요.",
-    img: "./guide_imgs/insta_step4_export.png",
+    img: "/ui_kits/app/guide_imgs/insta_step4_export.png",
+    highlights: [{ top: "82%", left: "4%", width: "92%", height: "16%", borderRadius: 14 }],
   },
   {
     num: 5,
     title: "'기기로 내보내기' 선택",
     desc: "내보낼 위치 선택 화면에서 '기기로 내보내기'를 탭해요.",
-    img: "./guide_imgs/insta_step5_location.png",
+    img: "/ui_kits/app/guide_imgs/insta_step5_location.png",
+    highlights: [{ top: "43%", left: "2%", width: "96%", height: "23%", borderRadius: 8 }],
   },
   {
     num: 6,
     title: "형식 JSON · 기간 선택",
     desc: "'정보 맞춤 설정'에서 '메시지'만 체크하고 나머지는 해제해요. '기간'을 원하는 범위로, '형식'을 JSON으로 바꾼 뒤 '내보내기 시작'을 탭해요.",
     tip: "JSON 꼭 선택해야 해요! 기간은 뭐든 상관없어요",
-    img: "./guide_imgs/insta_step6_config.svg",
+    img: "/ui_kits/app/guide_imgs/insta_step6_config.png",
+    highlights: [
+      { top: "16%", left: "2%", width: "96%", height: "12%", borderRadius: 8 },
+      { top: "29%", left: "2%", width: "96%", height: "12%", borderRadius: 8 },
+      { top: "81%", left: "3%", width: "94%", height: "11%", borderRadius: 12 },
+    ],
   },
   {
     num: 7,
@@ -48,12 +58,23 @@ const INSTA_STEPS = [
   },
 ];
 
+// 마운트 시 모든 이미지 미리 로드
+const IMG_SRCS = INSTA_STEPS.map(s => s.img).filter(Boolean);
+IMG_SRCS.forEach(src => { const i = new Image(); i.src = src; });
+
 function UploadScreen({ onNavigate, appData, setAppData }) {
   const { AppShell } = window;
   const [current, setCurrent] = useState(0);
+  const [imgKey, setImgKey] = useState(0);
   const [files, setFiles] = useState([]);
   const [error, setError] = useState("");
+  const [warning, setWarning] = useState("");
   const fileRef = useRef();
+
+  function goTo(idx) {
+    setCurrent(idx);
+    setImgKey(k => k + 1);
+  }
 
   const step = INSTA_STEPS[current];
   const total = INSTA_STEPS.length;
@@ -65,7 +86,12 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
       return !n.endsWith(".zip") && !n.endsWith(".json");
     });
     if (invalid.length > 0) { setError("zip 또는 json 파일만 선택해주세요"); return; }
-    setError("");
+    const large = newFiles.find(f => f.size > 100 * 1024 * 1024);
+    if (large) {
+      setWarning(`파일 크기가 ${(large.size / 1024 / 1024).toFixed(0)}MB예요. 사진·영상이 포함돼 처리에 시간이 걸릴 수 있어요.`);
+    } else {
+      setWarning("");
+    }
     setFiles(prev => {
       const existing = new Set(prev.map(f => f.name));
       return [...prev, ...newFiles.filter(f => !existing.has(f.name))];
@@ -105,7 +131,7 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
         {INSTA_STEPS.map((_, i) => (
           <div
             key={i}
-            onClick={() => setCurrent(i)}
+            onClick={() => goTo(i)}
             style={{
               flex: 1, height: 3, borderRadius: 99, cursor: "pointer",
               background: i <= current
@@ -134,17 +160,32 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
             background: "rgba(240,148,51,0.1)", border: "1px solid rgba(240,148,51,0.2)",
             borderRadius: 12, fontSize: 13, color: "#f09433", lineHeight: 1.6,
           }}>
-            💡 {step.tip}
+            {step.tip}
           </div>
         )}
 
         {step.img && (
-          <div style={{ borderRadius: 16, overflow: "hidden", border: "1.5px solid rgba(255,255,255,0.15)", background: "#111" }}>
+          <div style={{ borderRadius: 16, overflow: "hidden", border: "1.5px solid rgba(255,255,255,0.12)", background: "#111", position: "relative" }}>
             <img
+              key={imgKey}
               src={step.img}
               alt={step.title}
-              style={{ width: "100%", display: "block", maxHeight: 220, objectFit: "contain" }}
+              className="anim-fade"
+              style={{ width: "100%", display: "block", height: "auto" }}
             />
+            {(step.highlights || []).map((h, i) => (
+              <div
+                key={i}
+                className="highlight-overlay"
+                style={{
+                  top: h.top,
+                  left: h.left,
+                  width: h.width,
+                  height: h.height,
+                  borderRadius: h.borderRadius || 8,
+                }}
+              />
+            ))}
           </div>
         )}
 
@@ -178,13 +219,14 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
                 color: "#e1306c",
               }}
             >
-              {files.length === 0 ? "📂  zip 파일 선택하기" : `+ 파일 추가 (현재 ${files.length}개)`}
+              {files.length === 0 ? "zip 파일 선택하기" : `+ 파일 추가 (현재 ${files.length}개)`}
             </button>
             <input
               ref={fileRef} type="file" accept=".zip,.json" multiple style={{ display: "none" }}
               onChange={e => { handleAddFiles(Array.from(e.target.files)); e.target.value = ""; }}
             />
-            {error && <div style={{ fontSize: 12, color: "#e1306c" }}>⚠️ {error}</div>}
+            {warning && <div style={{ fontSize: 12, color: "#f09433" }}>{warning}</div>}
+            {error && <div style={{ fontSize: 12, color: "#e1306c" }}>{error}</div>}
           </div>
         )}
       </div>
@@ -192,7 +234,7 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
       {/* 네비게이션 버튼 */}
       <div style={{ display: "flex", gap: 10, marginTop: "auto" }}>
         <button
-          onClick={() => setCurrent(c => Math.max(0, c - 1))}
+          onClick={() => goTo(Math.max(0, current - 1))}
           disabled={current === 0}
           style={{
             flex: 1, padding: "14px",
@@ -206,7 +248,7 @@ function UploadScreen({ onNavigate, appData, setAppData }) {
 
         {!isLast ? (
           <button
-            onClick={() => setCurrent(c => c + 1)}
+            onClick={() => goTo(current + 1)}
             style={{
               flex: 2, padding: "14px",
               background: "linear-gradient(135deg, #f09433, #e1306c)",

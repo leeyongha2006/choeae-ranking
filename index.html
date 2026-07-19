@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="theme-color" content="#e1306c" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="default" />
+<title>최애친구랭킹</title>
+<link rel="stylesheet" href="/styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--surface-canvas); }
+  a { color: var(--color-primary); }
+  a:hover { color: var(--color-primary-hover); }
+
+  @keyframes fadeSlideUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.96); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+  .anim-slide-up { animation: fadeSlideUp 0.38s cubic-bezier(0.22,1,0.36,1) both; }
+  .anim-slide-up-2 { animation: fadeSlideUp 0.38s 0.08s cubic-bezier(0.22,1,0.36,1) both; }
+  .anim-slide-up-3 { animation: fadeSlideUp 0.38s 0.16s cubic-bezier(0.22,1,0.36,1) both; }
+  .anim-slide-up-4 { animation: fadeSlideUp 0.38s 0.24s cubic-bezier(0.22,1,0.36,1) both; }
+  .anim-fade { animation: fadeIn 0.3s ease both; }
+  .anim-scale { animation: scaleIn 0.3s cubic-bezier(0.22,1,0.36,1) both; }
+
+  @keyframes marchingAnts {
+    to { background-position: 12px 0, -12px 100%, 0 -12px, 100% 12px; }
+  }
+  .highlight-overlay {
+    position: absolute;
+    pointer-events: none;
+    background-image:
+      linear-gradient(90deg, #e1306c 50%, transparent 50%),
+      linear-gradient(90deg, #e1306c 50%, transparent 50%),
+      linear-gradient(0deg, #e1306c 50%, transparent 50%),
+      linear-gradient(0deg, #e1306c 50%, transparent 50%);
+    background-repeat: repeat-x, repeat-x, repeat-y, repeat-y;
+    background-size: 12px 2.5px, 12px 2.5px, 2.5px 12px, 2.5px 12px;
+    background-position: 0 0, 0 100%, 0 0, 100% 0;
+    animation: marchingAnts 0.55s linear infinite;
+  }
+
+  @media (max-width: 700px) {
+    aside { display: none !important; }
+    main {
+      padding: 20px 16px 88px !important;
+      max-width: 100% !important;
+    }
+    header { padding: 10px 16px !important; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script src="https://js.tosspayments.com/v1/payment"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script src="/_ds_bundle.js"></script>
+<script src="/ui_kits/app/DataParser.js"></script>
+<script type="text/babel" src="/ui_kits/app/AppShell.jsx"></script>
+<script type="text/babel" src="/ui_kits/app/GuideModal.jsx"></script>
+<script type="text/babel" src="/ui_kits/app/OnboardingScreen.jsx"></script>
+<script type="text/babel" src="/ui_kits/app/UploadScreen.jsx"></script>
+<script type="text/babel" src="/ui_kits/app/AnalyzingScreen.jsx"></script>
+<script type="text/babel" src="/ui_kits/app/DashboardScreen.jsx"></script>
+<script type="text/babel" src="/ui_kits/app/Top5Screen.jsx"></script>
+<script type="text/babel" src="/ui_kits/app/ShareCardScreen.jsx"></script>
+<script type="text/babel" src="/ui_kits/app/App.jsx"></script>
+<script type="text/babel">
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>
