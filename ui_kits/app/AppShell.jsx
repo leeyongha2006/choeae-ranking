@@ -57,11 +57,7 @@ function AppShell({ activeNav, onNavigate, children, hideNav }) {
         width: "100%",
         maxWidth: 480,
         margin: "0 auto",
-        padding: hideNav
-          ? "24px 20px 32px"
-          : isMobile
-            ? "24px 18px 100px"
-            : "32px 20px 100px",
+        padding: isMobile ? "24px 18px 40px" : "32px 20px 48px",
         display: "flex", flexDirection: "column",
         gap: 18,
         boxSizing: "border-box",
@@ -69,49 +65,6 @@ function AppShell({ activeNav, onNavigate, children, hideNav }) {
         {children}
       </main>
 
-      {!hideNav && (
-        <nav style={{
-          position: "fixed", bottom: 0, left: 0, right: 0, zIndex: 50,
-          background: "rgba(13,13,13,0.96)",
-          backdropFilter: "blur(20px)",
-          borderTop: "1px solid rgba(255,255,255,0.07)",
-          display: "flex",
-          paddingBottom: "env(safe-area-inset-bottom, 0px)",
-        }}>
-          {NAV_TABS.map(t => {
-            const isActive = activeNav === t.key;
-            return (
-              <button
-                key={t.key}
-                onClick={() => onNavigate(t.key)}
-                style={{
-                  flex: 1, display: "flex", flexDirection: "column",
-                  alignItems: "center", justifyContent: "center",
-                  gap: 4, padding: "12px 4px 10px",
-                  background: "none", border: "none", cursor: "pointer",
-                  WebkitTapHighlightColor: "transparent",
-                  position: "relative",
-                }}
-              >
-                {isActive && (
-                  <div style={{
-                    position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
-                    width: 24, height: 2, borderRadius: 99,
-                    background: "linear-gradient(90deg, #f09433, #e1306c)",
-                  }} />
-                )}
-                {t.icon(isActive)}
-                <span style={{
-                  fontSize: 10, fontWeight: isActive ? 700 : 500,
-                  fontFamily: "var(--font-body)",
-                  color: isActive ? "#e1306c" : "#555",
-                  letterSpacing: "-0.01em",
-                }}>{t.label}</span>
-              </button>
-            );
-          })}
-        </nav>
-      )}
     </div>
   );
 }

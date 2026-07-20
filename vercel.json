@@ -1,0 +1,5 @@
+{
+  "rewrites": [
+    { "source": "/((?!ui_kits|styles|tokens|components|_ds_bundle|assets).*)", "destination": "/index.html" }
+  ]
+}

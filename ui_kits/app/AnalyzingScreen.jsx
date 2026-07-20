@@ -5,7 +5,7 @@ const STEPS = [
   { label: "파일 읽기 중…", key: "read" },
   { label: "대화 데이터 파싱 중…", key: "parse" },
   { label: "소통 점수 계산 중…", key: "score" },
-  { label: "랭킹 생성 완료 🎉", key: "done" },
+  { label: "랭킹 생성 완료", key: "done" },
 ];
 
 function AnalyzingScreen({ onNavigate, appData, setAppData }) {
@@ -124,7 +124,7 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
             분석 중
           </div>
           <div style={{ fontFamily: "var(--font-display)", fontSize: 30, fontWeight: 900, color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.2 }}>
-            찐친 찾는 중<br />잠깐만요… 🔍
+            찐친 찾는 중<br />잠깐만요…
           </div>
         </div>
 

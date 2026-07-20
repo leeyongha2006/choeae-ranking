@@ -11,11 +11,17 @@ const DEMO_RANK = [
   { rank: 7, medal: "7️⃣", name: "류지원", score: 32, instaCount: 312 },
 ];
 
-const TOSS_CLIENT_KEY = "test_ck_6BYq7GWPVvyLLogZM5YI3NE5vbo1";
+const TOSS_CLIENT_KEY = "test_ck_6BYq7GWPVvyLLogZM5Yl3NE5vbo1";
+
+const PAYMENT_METHODS = [
+  { key: "토스페이", label: "토스페이" },
+  { key: "카드",    label: "신용 · 체크카드" },
+];
 
 function PaywallModal({ totalLocked, appData, onClose }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [method, setMethod] = useState("토스페이");
 
   function handlePay() {
     setLoading(true);
@@ -24,7 +30,7 @@ function PaywallModal({ totalLocked, appData, onClose }) {
     const orderId = "order_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
     const baseUrl = window.location.origin + window.location.pathname;
     const tossPayments = TossPayments(TOSS_CLIENT_KEY);
-    tossPayments.requestPayment("카드", {
+    tossPayments.requestPayment(method, {
       amount: 990,
       orderId,
       orderName: "최애친구 랭킹 전체 보기",
@@ -66,6 +72,24 @@ function PaywallModal({ totalLocked, appData, onClose }) {
           <div style={{ fontSize: 36, fontWeight: 900, color: "#fff", fontFamily: "var(--font-display)" }}>₩990</div>
           <div style={{ fontSize: 12, color: "#555", marginTop: 4 }}>1회 결제 · 평생 열람</div>
         </div>
+        {/* 결제 수단 선택 */}
+        <div style={{ display: "flex", gap: 8 }}>
+          {PAYMENT_METHODS.map(m => (
+            <button
+              key={m.key}
+              onClick={() => setMethod(m.key)}
+              style={{
+                flex: 1, padding: "11px",
+                background: method === m.key ? "rgba(225,48,108,0.12)" : "#1e1e1e",
+                border: method === m.key ? "1.5px solid #e1306c" : "1.5px solid #2a2a2a",
+                borderRadius: 12,
+                fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 700,
+                color: method === m.key ? "#e1306c" : "#555",
+                cursor: "pointer", transition: "all 150ms",
+              }}
+            >{m.label}</button>
+          ))}
+        </div>
         {error && (
           <div style={{ fontSize: 12, color: "#e1306c", textAlign: "center" }}>{error}</div>
         )}
@@ -80,7 +104,7 @@ function PaywallModal({ totalLocked, appData, onClose }) {
             color: loading ? "#555" : "#fff", cursor: loading ? "default" : "pointer",
           }}
         >
-          {loading ? "결제창 여는 중…" : "990원으로 전체 보기 💳"}
+          {loading ? "결제창 여는 중…" : "990원으로 전체 보기"}
         </button>
         <button onClick={onClose} style={{
           background: "none", border: "none", fontSize: 13,
@@ -251,7 +275,7 @@ function Top5Screen({ onNavigate, appData, isPaid, setIsPaid }) {
             fontSize: 13, fontWeight: 700, color: "#fff", cursor: "pointer",
           }}
         >
-          공유 💌
+          공유
         </button>
       </div>
 
@@ -327,9 +351,6 @@ function Top5Screen({ onNavigate, appData, isPaid, setIsPaid }) {
         )}
       </div>
 
-      <div style={{ textAlign: "center", fontSize: 11, color: "#333" }}>
-        카드를 탭하면 상세 정보를 볼 수 있어요
-      </div>
     </AppShell>
   );
 }

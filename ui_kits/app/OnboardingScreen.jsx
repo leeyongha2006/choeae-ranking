@@ -45,19 +45,18 @@ function OnboardingScreen({ onNavigate }) {
       {/* 기능 요약 */}
       <div style={{ width: "100%", maxWidth: 380, display: "flex", flexDirection: "column", gap: 12 }}>
         {[
-          { icon: "📂", text: "zip 파일 하나면 충분" },
-          { icon: "📊", text: "DM 기반 소통 점수 계산" },
-          { icon: "🏆", text: "친구 순위 TOP 10" },
-        ].map((item) => (
-          <div key={item.text} style={{
+          "zip 파일 하나면 충분",
+          "DM 기반 소통 점수 계산",
+          "친구 순위 TOP 10",
+        ].map((text) => (
+          <div key={text} style={{
             display: "flex", alignItems: "center", gap: 14,
             padding: "14px 18px",
             background: "rgba(255,255,255,0.04)",
             border: "1px solid rgba(255,255,255,0.07)",
             borderRadius: 14,
           }}>
-            <span style={{ fontSize: 20 }}>{item.icon}</span>
-            <span style={{ fontSize: 15, fontWeight: 600, color: "#ccc" }}>{item.text}</span>
+            <span style={{ fontSize: 15, fontWeight: 600, color: "#ccc" }}>{text}</span>
           </div>
         ))}
       </div>

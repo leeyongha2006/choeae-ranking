@@ -1,5 +1,5 @@
 (function () {
-const { useState } = React;
+const { useState, useRef } = React;
 
 const THEMES = [
   { label: "다크 그라디언트", value: "dark", bg: "linear-gradient(135deg, #1a0a00, #2d0d18, #1a0020)", textColor: "#fff" },
@@ -9,11 +9,11 @@ const THEMES = [
 ];
 
 const AI_COMMENTS = [
-  "이번 달 소통왕은 바로 이 친구! 🔥",
-  "이 케미, 심상치 않은데요? 👀",
-  "대화량으로 증명된 찐우정, 부럽습니다 💜",
-  "응답 속도 보면 관계가 보인다… 👁️",
-  "알림음이 제일 반가운 사람 🔔",
+  "이번 달 소통왕은 바로 이 친구",
+  "이 케미, 심상치 않은데요",
+  "대화량으로 증명된 찐우정",
+  "응답 속도 보면 관계가 보인다",
+  "알림음이 제일 반가운 사람",
 ];
 
 function Toggle({ checked, onChange, label }) {
@@ -36,6 +36,8 @@ function Toggle({ checked, onChange, label }) {
   );
 }
 
+const APP_URL = "https://jjinchinfriend-ranking.vercel.app";
+
 function ShareCardScreen({ onNavigate, appData }) {
   const { AppShell } = window;
 
@@ -43,12 +45,62 @@ function ShareCardScreen({ onNavigate, appData }) {
   const top5Names = hasData
     ? appData.rankings.slice(0, 5).map((f) => f.name)
     : ["김민지", "이준호", "박서연", "최다인", "정하늘"];
+  const top1 = top5Names[0] || "친구";
 
-  const [title, setTitle] = useState("이번 달 나의 최애 친구는?");
+  const [title, setTitle] = useState("나의 찐친 순위");
   const [nickname, setNickname] = useState("나");
   const [showNames, setShowNames] = useState(true);
   const [commentIdx, setCommentIdx] = useState(0);
   const [themeIdx, setThemeIdx] = useState(0);
+  const [copied, setCopied] = useState(false);
+  const [shareErr, setShareErr] = useState("");
+  const [saving, setSaving] = useState(false);
+  const cardRef = useRef(null);
+
+  function buildShareText() {
+    return `내 인스타 찐친 1위는 ${top1} 🥇\n너의 찐친은 누구야?\n👉 ${APP_URL}`;
+  }
+
+  async function handleShare() {
+    setShareErr("");
+    const shareData = {
+      title: "최애친구랭킹",
+      text: buildShareText(),
+      url: APP_URL,
+    };
+    if (navigator.share) {
+      try { await navigator.share(shareData); }
+      catch (e) { if (e.name !== "AbortError") setShareErr("공유에 실패했어요."); }
+    } else {
+      handleCopy();
+    }
+  }
+
+  async function handleSave() {
+    if (!cardRef.current || saving) return;
+    setSaving(true);
+    try {
+      const canvas = await html2canvas(cardRef.current, { scale: 3, useCORS: true, backgroundColor: null });
+      const link = document.createElement("a");
+      link.download = "찐친랭킹.png";
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch {
+      setShareErr("이미지 저장에 실패했어요.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleCopy() {
+    try {
+      await navigator.clipboard.writeText(APP_URL);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setShareErr("클립보드 복사에 실패했어요.");
+    }
+  }
 
   const theme = THEMES[themeIdx];
   const comment = AI_COMMENTS[commentIdx];
@@ -78,7 +130,7 @@ function ShareCardScreen({ onNavigate, appData }) {
       </div>
 
       {/* 미리보기 카드 */}
-      <div style={{
+      <div ref={cardRef} style={{
         width: "100%", aspectRatio: "3/4", maxHeight: 360,
         borderRadius: 24, background: theme.bg,
         boxShadow: "0 8px 40px rgba(0,0,0,0.5)",
@@ -171,26 +223,51 @@ function ShareCardScreen({ onNavigate, appData }) {
       </div>
 
       {/* 공유 버튼 */}
-      <div style={{ display: "flex", gap: 10 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <button
-          onClick={() => alert("인스타그램 공유는 Web Share API로 구현됩니다.")}
+          onClick={handleShare}
           style={{
-            flex: 1, padding: "15px",
-            background: "linear-gradient(135deg, #f09433, #e1306c)",
+            width: "100%", padding: "16px",
+            background: "linear-gradient(135deg, #f09433, #e1306c, #bc1888)",
             border: "none", borderRadius: 14,
-            fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 900,
+            fontFamily: "var(--font-body)", fontSize: 15, fontWeight: 900,
             color: "#fff", cursor: "pointer",
           }}
-        >📷 인스타 공유</button>
+        >
+          공유하기
+        </button>
         <button
-          onClick={() => alert("카드 이미지 다운로드 기능은 html2canvas로 구현됩니다.")}
+          onClick={handleCopy}
           style={{
-            padding: "15px 18px",
-            background: "#1e1e1e", border: "none", borderRadius: 14,
+            width: "100%", padding: "14px",
+            background: copied ? "rgba(34,197,94,0.15)" : "#1e1e1e",
+            border: copied ? "1px solid rgba(34,197,94,0.4)" : "1px solid #2a2a2a",
+            borderRadius: 14,
             fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 700,
-            color: "#888", cursor: "pointer",
+            color: copied ? "#4ade80" : "#888", cursor: "pointer",
+            transition: "all 200ms",
           }}
-        >⬇</button>
+        >
+          {copied ? "복사됨" : "링크 복사"}
+        </button>
+        <button
+          onClick={handleSave}
+          disabled={saving}
+          style={{
+            width: "100%", padding: "14px",
+            background: "#1e1e1e",
+            border: "1px solid #2a2a2a",
+            borderRadius: 14,
+            fontFamily: "var(--font-body)", fontSize: 14, fontWeight: 700,
+            color: saving ? "#444" : "#888", cursor: saving ? "default" : "pointer",
+            transition: "all 200ms",
+          }}
+        >
+          {saving ? "저장 중…" : "이미지로 저장"}
+        </button>
+        {shareErr && (
+          <div style={{ fontSize: 12, color: "#e1306c", textAlign: "center" }}>{shareErr}</div>
+        )}
       </div>
     </AppShell>
   );

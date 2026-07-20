@@ -1,0 +1,5 @@
+*.zip
+_tmp_*.txt
+uploads/
+docs/
+assets/
