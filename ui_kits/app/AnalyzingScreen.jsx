@@ -34,7 +34,7 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
 
   async function runAnalysis() {
     try {
-      const { parseInstagram, computeRankings } = window.DataParser;
+      const { parseInstagram, addConversation, computeAllRankings } = window.DataParser;
 
       advance(0, 15);
       await delay(400);
@@ -72,37 +72,34 @@ function AnalyzingScreen({ onNavigate, appData, setAppData }) {
           if (!myName && detectedMyName) myName = detectedMyName;
 
           for (const result of allResults) {
-            const totalInFile = Object.values(result.counts).reduce((a, b) => a + b, 0);
             const friendName = Object.keys(result.counts).find(n => n !== detectedMyName);
-            if (friendName) {
-              instaData[friendName] = (instaData[friendName] || 0) + totalInFile;
-            }
+            if (friendName) addConversation(instaData, friendName, result);
           }
         } else {
           const json = await readFileAsJSON(file);
           const result = parseInstagram(json);
           if (!result) continue;
           if (!myName && result.myName) myName = result.myName;
-          const totalInFile = Object.values(result.counts).reduce((a, b) => a + b, 0);
           const friendName = Object.keys(result.counts).find(n => n !== myName);
-          if (friendName) {
-            instaData[friendName] = (instaData[friendName] || 0) + totalInFile;
-          }
+          if (friendName) addConversation(instaData, friendName, result);
         }
       }
 
       advance(2, 75);
       await delay(500);
 
-      const rankings = computeRankings(instaData, myName);
-      const totalMessages = Object.values(instaData).reduce((a, b) => a + b, 0);
+      const rankingsByPeriod = computeAllRankings(instaData, myName);
+      // 최근 3개월 대화가 없으면 전체 기준으로 시작
+      const period = rankingsByPeriod.recent.length > 0 ? "recent" : "all";
+      const rankings = rankingsByPeriod[period];
+      const totalMessages = Object.values(instaData).reduce((a, e) => a + e.total, 0);
       const totalContacts = Object.keys(instaData).length;
 
       advance(3, 100);
       await delay(600);
 
       setAppData((prev) => ({
-        ...prev, instaData, rankings, totalMessages, totalContacts,
+        ...prev, instaData, rankings, rankingsByPeriod, period, totalMessages, totalContacts,
         uploadedAt: new Date().toLocaleDateString("ko-KR"),
       }));
 

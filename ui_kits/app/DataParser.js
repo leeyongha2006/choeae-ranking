@@ -28,44 +28,95 @@
     if (!fallback) return null;
 
     const counts = {};
+    // 월별 메시지 수 (key: monthIndex) — 기간별 랭킹 계산용
+    const months = {};
     if (data.messages && Array.isArray(data.messages)) {
       for (const msg of data.messages) {
         if (!msg.sender_name) continue;
         let name = fixInstaEncoding(msg.sender_name);
         if (name === INSTA_PLACEHOLDER) name = fallback;
         counts[name] = (counts[name] || 0) + 1;
+        if (msg.timestamp_ms) {
+          const m = monthIndex(msg.timestamp_ms);
+          months[m] = (months[m] || 0) + 1;
+        }
       }
     }
 
     const rawMyName = data.participants?.[0]?.name || null;
     const myName = fixInstaEncoding(rawMyName);
 
-    return { counts, myName, title };
+    return { counts, months, myName, title };
+  }
+
+  function monthIndex(ts) {
+    const d = new Date(ts);
+    return d.getFullYear() * 12 + d.getMonth();
+  }
+
+  // 대화방 하나의 결과를 친구별 누적 데이터에 합침
+  // instaData[friend] = { total, months: { [monthIndex]: count } }
+  function addConversation(instaData, friendName, result) {
+    const entry = instaData[friendName] || (instaData[friendName] = { total: 0, months: {} });
+    entry.total += Object.values(result.counts).reduce((a, b) => a + b, 0);
+    for (const m in result.months) {
+      entry.months[m] = (entry.months[m] || 0) + result.months[m];
+    }
   }
 
   // ── Rank ───────────────────────────────────────────────────────────
   const RANK_MEDALS = ["🥇", "🥈", "🥉", "4️⃣", "5️⃣", "6️⃣", "7️⃣", "8️⃣", "9️⃣", "🔟"];
 
-  function computeRankings(instaData, myName) {
-    const insta = instaData || {};
+  // months: 기준 월 포함 최근 N개월 (null = 전체)
+  const PERIODS = [
+    { key: "recent", label: "최근 3개월", topLabel: "요즘 최애", months: 3 },
+    { key: "year",   label: "최근 1년",   topLabel: "1년간 최애", months: 12 },
+    { key: "all",    label: "전체",       topLabel: "역대 최애", months: null },
+  ];
 
-    const names = Object.keys(insta).filter(n => n !== myName);
-    const max = Math.max(1, ...names.map(n => insta[n]));
+  function countInPeriod(entry, months, refMonth) {
+    if (!months) return entry.total;
+    const from = refMonth - months + 1;
+    let n = 0;
+    for (const m in entry.months) if (+m >= from) n += entry.months[m];
+    return n;
+  }
 
-    const sorted = names
-      .sort((a, b) => insta[b] - insta[a])
+  function computeRankings(instaData, myName, months, refMonth) {
+    const counts = {};
+    for (const name of Object.keys(instaData || {})) {
+      if (name === myName) continue;
+      const n = countInPeriod(instaData[name], months, refMonth);
+      if (n > 0) counts[name] = n;
+    }
+
+    const names = Object.keys(counts);
+    const max = Math.max(1, ...names.map(n => counts[n]));
+
+    return names
+      .sort((a, b) => counts[b] - counts[a])
       .map((name, i) => ({
         rank: i + 1,
         medal: RANK_MEDALS[i] || `${i + 1}`,
         name,
-        score: Math.round((insta[name] / max) * 100),
-        instaCount: insta[name],
+        score: Math.round((counts[name] / max) * 100),
+        instaCount: counts[name],
         kakaoCount: 0,
         avgResponseMin: null,
-        delta: i === 0 ? "—" : i % 2 === 0 ? `▲ ${i}` : `▼ ${i - 1}`,
       }));
+  }
 
-    return sorted;
+  // 기준 월 = 데이터에서 가장 최근 메시지가 있는 달 (내보내기 시점 기준)
+  function computeAllRankings(instaData, myName) {
+    let refMonth = -Infinity;
+    for (const entry of Object.values(instaData || {})) {
+      for (const m in entry.months) if (+m > refMonth) refMonth = +m;
+    }
+    const byPeriod = {};
+    for (const p of PERIODS) {
+      byPeriod[p.key] = computeRankings(instaData, myName, p.months, refMonth);
+    }
+    return byPeriod;
   }
 
   // ── Demo data fallback ─────────────────────────────────────────────
@@ -74,5 +125,5 @@
     return { insta };
   }
 
-  window.DataParser = { parseInstagram, computeRankings, getDemoData };
+  window.DataParser = { parseInstagram, addConversation, computeAllRankings, PERIODS, getDemoData };
 })();

@@ -1,2 +1,6 @@
 .vercel
 .env*
+
+# 개인 데이터 / 임시 파일
+instagram-*.zip
+_tmp_*.txt

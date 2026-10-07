@@ -117,7 +117,7 @@ function PaywallModal({ totalLocked, appData, onClose }) {
   );
 }
 
-function RankCard({ f, i, maxScore, selected, onSelect }) {
+function RankCard({ f, i, maxScore, selected, onSelect, periodLabel }) {
   const isFirst = i === 0;
   const isOpen = selected === f.name;
 
@@ -147,7 +147,7 @@ function RankCard({ f, i, maxScore, selected, onSelect }) {
             {f.name}
           </div>
           <div style={{ fontSize: 13, color: "#555", marginBottom: 16 }}>
-            총 {(f.instaCount || 0).toLocaleString()}회 대화
+            {periodLabel} {(f.instaCount || 0).toLocaleString()}회 대화
           </div>
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
             <div style={{ flex: 1, height: 4, background: "rgba(255,255,255,0.06)", borderRadius: 99, marginRight: 12, overflow: "hidden" }}>
@@ -227,13 +227,44 @@ function RankCard({ f, i, maxScore, selected, onSelect }) {
   );
 }
 
-function Top5Screen({ onNavigate, appData, isPaid, setIsPaid }) {
+function PeriodTabs({ period, onChange }) {
+  const { PERIODS } = window.DataParser;
+  return (
+    <div style={{ display: "flex", gap: 4, background: "#161616", border: "1px solid #1e1e1e", borderRadius: 12, padding: 4 }}>
+      {PERIODS.map(p => {
+        const active = p.key === period;
+        return (
+          <button
+            key={p.key}
+            onClick={() => onChange(p.key)}
+            style={{
+              flex: 1, padding: "9px 0", border: "none", borderRadius: 9,
+              background: active ? "#2a2a2a" : "transparent",
+              fontFamily: "var(--font-body)", fontSize: 13, fontWeight: 700,
+              color: active ? "#fff" : "#555", cursor: "pointer", transition: "all 150ms",
+            }}
+          >{p.label}</button>
+        );
+      })}
+    </div>
+  );
+}
+
+function Top5Screen({ onNavigate, appData, setAppData, isPaid, setIsPaid }) {
   const { AppShell } = window;
+  const { PERIODS } = window.DataParser;
   const [selected, setSelected] = useState(null);
   const [showPaywall, setShowPaywall] = useState(false);
 
-  const hasData = appData && appData.rankings && appData.rankings.length > 0;
+  const byPeriod = appData && appData.rankingsByPeriod;
+  const hasData = !!byPeriod || !!(appData && appData.rankings && appData.rankings.length > 0);
   const allRank = hasData ? appData.rankings : DEMO_RANK;
+  const periodInfo = PERIODS.find(p => p.key === (byPeriod ? appData.period : "all"));
+
+  function changePeriod(key) {
+    setSelected(null);
+    setAppData(prev => ({ ...prev, period: key, rankings: prev.rankingsByPeriod[key] }));
+  }
 
   const freeRank = allRank.slice(0, 3);
   const lockedRank = allRank.slice(3);
@@ -279,6 +310,8 @@ function Top5Screen({ onNavigate, appData, isPaid, setIsPaid }) {
         </button>
       </div>
 
+      {byPeriod && <PeriodTabs period={appData.period} onChange={changePeriod} />}
+
       {/* 요약 스탯 */}
       <div style={{
         background: "#161616", border: "1px solid #1e1e1e",
@@ -296,12 +329,12 @@ function Top5Screen({ onNavigate, appData, isPaid, setIsPaid }) {
           <div style={{ fontSize: 20, fontWeight: 900, color: "#e1306c", fontFamily: "var(--font-display)" }}>
             {topFriend?.name || "—"}
           </div>
-          <div style={{ fontSize: 11, color: "#555", marginTop: 2 }}>이달의 최애</div>
+          <div style={{ fontSize: 11, color: "#555", marginTop: 2 }}>{periodInfo.topLabel}</div>
         </div>
         <div style={{ width: 1, height: 32, background: "#2a2a2a" }} />
         <div style={{ textAlign: "center" }}>
           <div style={{ fontSize: 20, fontWeight: 900, color: "#fff", fontFamily: "var(--font-display)" }}>
-            {appData?.totalContacts || allRank.length}명
+            {allRank.length}명
           </div>
           <div style={{ fontSize: 11, color: "#555", marginTop: 2 }}>분석 대상</div>
         </div>
@@ -313,8 +346,14 @@ function Top5Screen({ onNavigate, appData, isPaid, setIsPaid }) {
           TOP {isPaid ? allRank.length : 3}
         </div>
         {rank.map((f, i) => (
-          <RankCard key={f.name} f={f} i={i} maxScore={maxScore} selected={selected} onSelect={onSelect} />
+          <RankCard key={f.name} f={f} i={i} maxScore={maxScore} selected={selected} onSelect={onSelect} periodLabel={periodInfo.label} />
         ))}
+
+        {allRank.length === 0 && (
+          <div style={{ textAlign: "center", fontSize: 13, color: "#555", padding: "32px 0" }}>
+            {periodInfo.label} 동안 주고받은 DM이 없어요
+          </div>
+        )}
 
         {!isPaid && lockedRank.length > 0 && (
           <div

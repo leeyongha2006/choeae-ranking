@@ -41,7 +41,7 @@ const APP_URL = "https://jjinchinfriend-ranking.vercel.app";
 function ShareCardScreen({ onNavigate, appData }) {
   const { AppShell } = window;
 
-  const hasData = appData && appData.rankings && appData.rankings.length > 0;
+  const hasData = !!(appData && (appData.rankingsByPeriod || (appData.rankings && appData.rankings.length > 0)));
   const top5Names = hasData
     ? appData.rankings.slice(0, 5).map((f) => f.name)
     : ["김민지", "이준호", "박서연", "최다인", "정하늘"];
